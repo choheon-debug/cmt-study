@@ -1,0 +1,646 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light only">
+<title>CMT Level I 공부</title>
+<meta name="description" content="CMT Level I 문제 300개, 실전 모의고사, 암기카드, 교재 읽어주기">
+<meta name="theme-color" content="#EAEAEA">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="CMT 공부">
+<meta name="format-detection" content="telephone=no">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<style>
+:root{
+  --bg:#EAEAEA; --card:#fff; --ink:#1f2937; --muted:#6b7280; --line:#e5e7eb; --soft:#f9fafb;
+  --teal:#7c3aed; --teal-d:#6d28d9; --teal-l:#ede9fe; --blue:#3b82f6; --orange:#f97316; --purple:#a855f7; --green:#22c55e; --red:#ef4444;
+  --shadow:0 10px 15px -3px rgb(0 0 0 / .1),0 4px 6px -2px rgb(0 0 0 / .05);
+  color-scheme:light;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR","Malgun Gothic",system-ui,sans-serif;-webkit-text-size-adjust:100%;font-size:17px}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+[hidden]{display:none!important}
+.wrap{max-width:36rem;margin:0 auto;padding:calc(env(safe-area-inset-top,0px) + 12px) max(12px,env(safe-area-inset-right,0px)) calc(env(safe-area-inset-bottom,0px) + 100px) max(12px,env(safe-area-inset-left,0px));display:flex;flex-direction:column;gap:12px}
+header{text-align:center;position:relative;padding:4px 46px}
+header h1{margin:0;font-size:1.55rem;font-weight:800}
+header p{margin:3px 0 0;font-size:.84rem;color:var(--muted)}
+.gear{position:absolute;right:0;top:2px;width:42px;height:42px;border:0;border-radius:50%;background:#fff;box-shadow:0 2px 6px rgb(0 0 0 / .08);font-size:1.15rem}
+.back{position:absolute;left:0;top:2px;height:42px;border:0;border-radius:21px;background:#fff;box-shadow:0 2px 6px rgb(0 0 0 / .08);padding:0 12px;font-weight:800;font-size:.9rem}
+.card{background:var(--card);border-radius:1.5rem;box-shadow:var(--shadow);padding:16px}
+.t{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin:0 0 10px;font-weight:800;font-size:1.05rem}
+.t span{font-weight:400;font-size:.8rem;color:var(--muted)}
+.sm{font-size:.84rem;color:var(--muted)}
+.btn{border:0;border-radius:14px;font-weight:800;color:#fff;padding:14px 12px;font-size:1.02rem;width:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;line-height:1.3}
+.btn small{font-weight:400;font-size:.8rem;opacity:.95}
+.btn:disabled{opacity:.45}
+.b-teal{background:var(--teal)}.b-blue{background:var(--blue)}.b-orange{background:var(--orange)}.b-purple{background:var(--purple)}.b-green{background:var(--green)}.b-gray{background:#eef0f3;color:var(--ink)}.b-red{background:#fff;color:#dc2626;box-shadow:inset 0 0 0 1px #fecaca}.b-kakao{background:#fee500;color:#3c1e1e}
+.g2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px}
+.g3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.mt{margin-top:10px}
+.bar{height:11px;background:#eef0f3;border-radius:6px;overflow:hidden}
+.bar i{display:block;height:100%;border-radius:6px;background:var(--green)}
+.subj{display:grid;grid-template-columns:8.2rem minmax(0,1fr) 3.4rem;gap:8px;align-items:center;padding:6px 0 0}
+.subj b{font-size:.9rem;white-space:nowrap}.subj .pct{text-align:right;font-weight:800}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{border:0;border-radius:999px;padding:7px 13px;font-size:.88rem;font-weight:800;background:#eef0f3;color:var(--muted)}
+.chip.on{background:var(--teal);color:#fff}
+.tag{display:inline-block;font-size:.72rem;font-weight:800;border-radius:7px;padding:2px 8px;background:var(--teal-l);color:#115e59}
+.qtext{font-size:1.15rem;font-weight:800;line-height:1.55;margin:12px 0 4px}
+.opt{width:100%;text-align:left;background:#fff;border:2px solid var(--line);border-radius:14px;padding:13px 12px;font-size:1.02rem;margin-top:9px;display:flex;gap:10px;align-items:center;line-height:1.45}
+.opt b{width:28px;height:28px;border-radius:50%;background:#eef0f3;display:grid;place-items:center;font-size:.88rem;flex:none}
+.opt.pick{border-color:var(--blue);background:#eff6ff}.opt.pick b{background:var(--blue);color:#fff}
+.opt.ok{border-color:var(--green);background:#f0fdf4}.opt.ok b{background:var(--green);color:#fff}
+.opt.no{border-color:var(--red);background:#fef2f2}.opt.no b{background:var(--red);color:#fff}
+.exp{background:#f0fdfa;border:1px solid #99f6e4;border-radius:14px;padding:12px;line-height:1.65;margin-top:12px}
+.exp.bad{background:#fff7ed;border-color:#fed7aa}
+.prog{display:flex;gap:3px;margin-top:4px}.prog i{flex:1;height:6px;border-radius:3px;background:#e5e7eb}.prog i.r{background:var(--green)}.prog i.w{background:var(--red)}.prog i.c{background:var(--teal-d)}
+.icon{border:0;background:#eef0f3;border-radius:12px;min-width:44px;height:40px;font-size:1.05rem;padding:0 10px;font-weight:800}
+.icon.on{background:#fef3c7}
+.nav{position:fixed;left:0;right:0;bottom:0;z-index:20;padding:8px max(10px,env(safe-area-inset-right,0px)) calc(env(safe-area-inset-bottom,0px) + 8px) max(10px,env(safe-area-inset-left,0px));pointer-events:none}
+.nav nav{pointer-events:auto;max-width:36rem;margin:0 auto;background:#fff;border-radius:20px;box-shadow:0 4px 18px rgb(0 0 0 / .14);display:grid;grid-template-columns:repeat(4,1fr);padding:5px}
+.nav button{border:0;background:none;border-radius:14px;padding:5px 0;font-size:.78rem;font-weight:800;color:var(--muted);display:flex;flex-direction:column;align-items:center}
+.nav button span{font-size:1.3rem}
+.nav button.on{background:var(--teal-l);color:#115e59}
+.toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 92px);transform:translateX(-50%);background:#1f2937;color:#fff;border-radius:12px;padding:11px 16px;font-size:.92rem;z-index:90;max-width:calc(100% - 32px);text-align:center}
+.modal{position:fixed;inset:0;background:rgb(0 0 0 / .5);z-index:60;display:flex;align-items:center;justify-content:center;padding:max(8px,env(safe-area-inset-top,0px)) 8px max(8px,env(safe-area-inset-bottom,0px))}
+.sheet{background:#fff;border-radius:20px;width:100%;max-width:36rem;max-height:92dvh;display:flex;flex-direction:column;padding:14px 16px}
+.sheet-head{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line);padding-bottom:8px;margin-bottom:10px}
+.sheet-head h3{margin:0;font-size:1.08rem;color:var(--teal-d)}
+.x{border:0;background:none;font-size:1.9rem;line-height:1;color:var(--muted)}
+.sbody{overflow-y:auto;overflow-x:hidden;flex:1}
+.lab{display:block;font-size:.86rem;font-weight:800;margin:12px 0 5px}
+.inp{width:100%;min-width:0;padding:11px 12px;border:1px solid #d1d5db;border-radius:12px;font-size:1rem;background:#fff}
+input[type=date].inp{-webkit-appearance:none;appearance:none;display:block;width:100%;max-width:100%;min-width:0;min-height:48px;text-align:left}
+input[type=date]::-webkit-date-and-time-value{text-align:left}
+textarea.inp{min-height:5rem;resize:vertical;line-height:1.5}
+/* 교재 */
+.sec{width:100%;text-align:left;background:none;border:0;border-top:1px solid var(--line);padding:12px 2px;display:flex;gap:10px;align-items:center}
+.sec:first-of-type{border-top:0}
+.sec .n{width:34px;height:34px;border-radius:10px;background:var(--teal-l);color:#115e59;font-weight:800;display:grid;place-items:center;flex:none;font-size:.9rem}
+.sec b{flex:1;font-size:.98rem;line-height:1.4}
+.book{line-height:1.75;font-size:1.02rem}
+.book h2{font-size:1.15rem;margin:22px 0 6px;color:var(--teal-d)}
+.book h2:first-child{margin-top:0}
+.book h3{font-size:1.03rem;margin:16px 0 4px}
+.book h4{font-size:.97rem;margin:10px 0 2px;color:#374151}
+.book p,.book .li{margin:4px 0;padding:2px 4px;border-radius:8px}
+.book .li{padding-left:1.4em;text-indent:-1.1em}
+.book .bx{border-radius:14px;padding:10px 12px;margin:10px 0;font-size:.97rem}
+.bx .k{display:inline-block;font-size:.74rem;font-weight:800;border-radius:6px;padding:1px 7px;margin-right:6px;color:#fff;text-indent:0}
+.bx.시험,.bx.주차{background:#fef2f2;border:1px solid #fecaca}.bx.시험 .k,.bx.주차 .k{background:#ef4444}
+.bx.이번{background:#f0fdfa;border:1px solid #99f6e4}.bx.이번 .k{background:#0d9488}
+.bx.실전{background:#f0fdf4;border:1px solid #bbf7d0}.bx.실전 .k{background:#16a34a}
+.bx.문제{background:#faf5ff;border:1px solid #e9d5ff}.bx.문제 .k{background:#9333ea}
+.bx.쉬운{background:#eff6ff;border:1px solid #bfdbfe}.bx.쉬운 .k{background:#3b82f6}
+.bx.실제{background:#f0fdf4;border:1px solid #bbf7d0}.bx.실제 .k{background:#16a34a}
+.bx.예제{background:#faf5ff;border:1px solid #e9d5ff}.bx.예제 .k{background:#9333ea}
+.bx.풀이{background:#fffbeb;border:1px solid #fde68a}.bx.풀이 .k{background:#d97706}
+.tw{overflow-x:auto;margin:10px 0;-webkit-overflow-scrolling:touch}
+.book table{border-collapse:collapse;font-size:.86rem;line-height:1.45;min-width:100%}
+.book th,.book td{border:1px solid #d1d5db;padding:6px 7px;text-align:left;vertical-align:top}
+.book th{background:#f0fdfa;white-space:nowrap}
+.reading{background:#fef08a!important;box-shadow:0 0 0 3px #fef08a}
+.player{position:fixed;left:0;right:0;bottom:calc(env(safe-area-inset-bottom,0px) + 82px);z-index:25;display:flex;justify-content:center;padding:0 12px;pointer-events:none}
+.player div{pointer-events:auto;background:#0f766e;color:#fff;border-radius:16px;box-shadow:0 6px 18px rgb(0 0 0 / .25);padding:8px 8px 8px 14px;display:flex;align-items:center;gap:8px;max-width:34rem;width:100%}
+.player span{flex:1;font-size:.88rem;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.player button{border:0;border-radius:12px;background:#fff;color:#0f766e;font-weight:800;padding:9px 12px;flex:none}
+/* 카드 */
+.flash{min-height:270px;display:flex;flex-direction:column;justify-content:center;text-align:center;cursor:pointer;user-select:none}
+.flash .front{font-size:1.25rem;font-weight:800;line-height:1.5;margin:8px 0}
+.flash .lines{text-align:left;margin-top:10px}
+.flash .lines div{background:#f9fafb;border-radius:12px;padding:9px 12px;margin-top:6px;line-height:1.55}
+.big{font-size:3rem;font-weight:800;line-height:1.05}
+.pass{display:inline-block;color:#fff;font-weight:800;border-radius:999px;padding:5px 14px;margin-top:8px}
+.grid{display:grid;grid-template-columns:repeat(10,1fr);gap:4px;margin-top:8px}
+.grid button{border:0;border-radius:6px;padding:6px 0;font-size:.74rem;font-weight:800;background:#eef0f3;color:var(--muted)}
+.grid button.d{background:var(--teal-l);color:#115e59}.grid button.cur{outline:2px solid var(--teal-d)}
+.timer{font-variant-numeric:tabular-nums;font-weight:800}
+.hint{background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;border-radius:14px;padding:10px 12px;font-size:.88rem;line-height:1.55}
+.info{background:#f0fdfa;border:1px solid #99f6e4;color:#115e59;border-radius:14px;padding:10px 12px;font-size:.88rem;line-height:1.55}
+.row{display:flex;align-items:center;gap:10px;border-top:1px solid var(--line);padding:10px 0}
+.row:first-of-type{border-top:0}
+.row .main{flex:1;min-width:0}
+.now{background:#f0fdfa;border-radius:14px;padding:14px;min-height:120px;line-height:1.65;font-size:1.05rem;margin-top:10px}
+@media (min-width:900px){.wrap,.nav nav{max-width:44rem}}
+</style>
+</head>
+<body>
+<main class="wrap" id="view"></main>
+<div class="nav"><nav id="nav"></nav></div>
+<div class="player" id="player" hidden><div><span id="plText">읽는 중…</span><button id="plStop">⏹ 멈춤</button></div></div>
+<script src="data.js"></script>
+<script>
+"use strict";
+/* =========================================================
+   CMT Level I 공부 — 모든 기록은 이 기기(localStorage)에만
+   ========================================================= */
+const KEY = "cmt.v1";
+const SUBJ = { T: "이론·심리", C: "차트·추세·패턴", A: "지표·통계·사이클", R: "위험·시장·윤리" };
+const SUBJ_SUB = { T: "1~2주차: 기초·다우 이론·EMH·행동재무학", C: "3~5주차: 차트·캔들·P&F·추세·패턴", A: "6~8주차: 지표·거래량·통계·사이클·시스템", R: "9~10주차: 위험관리·금융상품·상대강도·윤리" };
+const def = () => ({ q: {}, star: [], cards: {}, day: { d: "", n: 0 }, set: { exam: "", goal: 20, rate: 1, voice: "" }, mocks: [], my: [] });
+let S = def();
+try { const raw = localStorage.getItem(KEY); if (raw) S = Object.assign(def(), JSON.parse(raw)); S.set = Object.assign(def().set, S.set); } catch {}
+function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch { toast("저장 공간이 꽉 찼어요"); } }
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, m => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[m]));
+const today = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`; };
+const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const KEYK = ["시험 포인트", "주차 핵심 요약"];
+const QS = window.QS, BOOK = window.BOOK, QBY = Object.fromEntries(QS.map(q => [q.id, q]));
+function toast(t) { document.querySelector(".toast")?.remove(); const d = document.createElement("div"); d.className = "toast"; d.textContent = t; document.body.appendChild(d); setTimeout(() => d.remove(), 2400); }
+function modal(title, html, mount) {
+  const w = document.createElement("div"); w.className = "modal";
+  w.innerHTML = `<div class="sheet"><div class="sheet-head"><h3>${esc(title)}</h3><button class="x" aria-label="닫기">×</button></div><div class="sbody">${html}</div></div>`;
+  const close = () => { w.remove(); w.onclose?.(); };
+  w.addEventListener("click", e => { if (e.target === w || e.target.closest(".x")) close(); });
+  document.body.appendChild(w); mount?.(w, close); return w;
+}
+const secTitle = n => BOOK.find(s => s.n === n)?.title || "";
+
+/* ---------- 기록 ---------- */
+function mark(id, right) {
+  const r = S.q[id] || (S.q[id] = { r: 0, w: 0, last: 0, t: 0 });
+  right ? r.r++ : r.w++; r.last = right ? 1 : 0; r.t = Date.now();
+  if (S.day.d !== today()) S.day = { d: today(), n: 0 };
+  S.day.n++; save();
+}
+const wrongIds = () => QS.filter(q => S.q[q.id] && S.q[q.id].last === 0).map(q => q.id);
+function subjStat(s) {
+  let r = 0, n = 0, seen = 0, tot = 0;
+  for (const q of QS) if (q.s === s) { tot++; const x = S.q[q.id]; if (x) { seen++; r += x.r; n += x.r + x.w; } }
+  return { pct: n ? Math.round(r / n * 100) : null, seen, tot };
+}
+const todayN = () => S.day.d === today() ? S.day.n : 0;
+
+/* ---------- 읽어주기 (휴대폰 기본 목소리) ---------- */
+const TTS = {
+  ok: "speechSynthesis" in window, items: [], i: 0, on: false, timer: 0, wd: 0, lock: null, onStop: null,
+  voice() { const vs = speechSynthesis.getVoices().filter(v => /^ko/i.test(v.lang)); return vs.find(v => v.name === S.set.voice) || vs.find(v => /yuna|유나|google/i.test(v.name)) || vs[0] || null; },
+  /** items: [{text, el?, pause?(ms), label?}] */
+  unlock() {
+    // 아이폰: 무음 스위치가 켜져 있어도 소리가 나게 '재생' 모드로 바꾸고, 짧은 무음을 한 번 틀어 소리 길을 열어요
+    try { if (navigator.audioSession) navigator.audioSession.type = "playback"; } catch {}
+    if (!this.unlocked) { this.unlocked = true; try { const a = new Audio(SILENT); a.playsInline = true; a.play().catch(() => {}); } catch {} }
+  },
+  play(items, onStop) {
+    if (!this.ok) { toast("이 휴대폰은 읽어주기를 지원하지 않아요"); return; }
+    this.unlock();
+    this.stop(true, true); this.items = items.filter(x => x.text && x.text.trim()); this.i = 0; this.on = true; this.onStop = onStop || null;
+    navigator.wakeLock?.request("screen").then(l => this.lock = l).catch(() => {});
+    $("#player").hidden = false; this.next();
+  },
+  next() {
+    if (!this.on) return;
+    document.querySelectorAll(".reading").forEach(e => e.classList.remove("reading"));
+    const it = this.items[this.i];
+    if (!it) return this.stop();
+    if (it.el) { it.el.classList.add("reading"); it.el.scrollIntoView({ block: "center", behavior: "smooth" }); }
+    $("#plText").textContent = it.label || it.text.slice(0, 40);
+    it.onShow?.();
+    const parts = chunks(say(it.text)); let k = 0;
+    const speakPart = () => {
+      if (!this.on) return;
+      if (k >= parts.length) { this.i++; this.timer = setTimeout(() => this.next(), it.pause ?? 250); return; }
+      const u = this.u = new SpeechSynthesisUtterance(parts[k++]);   // 참조를 붙잡아 둬야 아이폰에서 끝 신호가 와요
+      u.lang = "ko-KR"; const v = this.noVoice ? null : this.voice(); if (v) u.voice = v; u.rate = S.set.rate || 1;
+      clearTimeout(this.wd);
+      this.wd = setTimeout(() => { if (this.on) { speechSynthesis.cancel(); speakPart(); } }, 4000 + u.text.length * 260 / u.rate);
+      u.onstart = () => { this.started = true; };
+      u.onend = () => { clearTimeout(this.wd); speakPart(); };
+      u.onerror = e => { clearTimeout(this.wd); if (e.error === "voice-unavailable" || e.error === "synthesis-failed") this.noVoice = true; if (e.error !== "interrupted" && e.error !== "canceled") speakPart(); };
+      try { speechSynthesis.resume(); } catch {}
+      speechSynthesis.speak(u);
+    };
+    if (this.i === 0 && !it.retry) { this.started = false; setTimeout(() => {
+      if (!this.on || this.started) return;
+      if (!this.noVoice) { this.noVoice = true; it.retry = true; try { speechSynthesis.cancel(); } catch {} clearTimeout(this.wd); setTimeout(() => this.next(), 150); return; }   // 고른 목소리가 안 되면 기본 목소리로 다시
+      toast("소리가 안 나면: 볼륨을 올리고, 옆의 무음 스위치를 끄고, 사파리에서 열어 주세요"); }, 2500); }
+    speakPart();
+  },
+  stop(silent, soft) {
+    const was = this.on;
+    this.on = false; clearTimeout(this.timer); clearTimeout(this.wd);
+    // 아이폰은 cancel 직후 바로 말하면 소리가 안 날 때가 있어서, 말하는 중일 때만 멈춰요
+    try { if (!soft || was || speechSynthesis.speaking || speechSynthesis.pending) speechSynthesis.cancel(); } catch {}
+    document.querySelectorAll(".reading").forEach(e => e.classList.remove("reading"));
+    $("#player").hidden = true; this.lock?.release?.().catch(() => {}); this.lock = null;
+    if (!silent) { const f = this.onStop; this.onStop = null; f?.(); }
+  },
+};
+$("#plStop").onclick = () => TTS.stop();
+if (TTS.ok) speechSynthesis.onvoiceschanged = () => {};
+const SILENT = (() => { const n = 800, b = new Uint8Array(44 + n), v = new DataView(b.buffer), w = (o, t) => [...t].forEach((c, i) => b[o + i] = c.charCodeAt(0));
+  w(0, "RIFF"); v.setUint32(4, 36 + n, true); w(8, "WAVEfmt "); v.setUint32(16, 16, true); v.setUint16(20, 1, true); v.setUint16(22, 1, true);
+  v.setUint32(24, 8000, true); v.setUint32(28, 8000, true); v.setUint16(32, 1, true); v.setUint16(34, 8, true); w(36, "data"); v.setUint32(40, n, true); b.fill(128, 44);
+  return "data:audio/wav;base64," + btoa(String.fromCharCode(...b)); })();
+/** 기호·약자를 읽기 좋게 바꿔요 */
+function say(t) {
+  return String(t)
+    .replace(/KS K 0021:2024/g, "케이에스 케이 공공이일 이천이십사년판").replace(/KS K 0021/g, "케이에스 케이 공공이일")
+    .replace(/ISO 3758/g, "아이에스오 삼칠오팔").replace(/^[①-⑳]\s*/, "").replace(/[①-⑳]/g, ", ")
+    .replace(/^\(\d+\)\s*/, "").replace(/^\d+\.\s+/, "").replace(/^[ⅠⅡⅢⅣⅤ]\.\s*/, "")
+    .replace(/(\d+)\s*~\s*(\d+)/g, "$1에서 $2").replace(/~/g, " ")
+    .replace(/(\d+)\/(\d+)/g, "$2분의 $1").replace(/℃/g, "도").replace(/%/g, " 퍼센트")
+    .replace(/\bpH\b/g, "피에이치").replace(/HLB/g, "에이치엘비").replace(/KB값/g, "케이비 값").replace(/CMC/g, "씨엠씨")
+    .replace(/W\/O/g, "더블유 오").replace(/O\/W/g, "오 더블유").replace(/\bppm\b/g, "피피엠").replace(/(\d)\s?ml\b/g, "$1밀리리터")
+    .replace(/(\d)\s?cm\b/g, "$1센티미터").replace(/(\d)m\b/g, "$1미터").replace(/\(g\)/g, "(그램)").replace(/\bPET\b/g, "페트").replace(/\bPCE\b/g, "피씨이")
+    .replace(/→/g, ", 다음은 ").replace(/[·ㆍ]/g, ", ").replace(/\bX\b/g, "엑스").replace(/[>]/g, ", ").replace(/\s+/g, " ").trim();
+}
+function chunks(t) {
+  const out = []; let cur = "";
+  for (const s of t.split(/(?<=[.!?])\s+/)) { if ((cur + " " + s).length > 160 && cur) { out.push(cur); cur = s; } else cur = cur ? cur + " " + s : s; }
+  if (cur) out.push(cur); return out;
+}
+function speakQuestion(q, opts, withAnswer) {
+  const items = [{ text: q.q, label: "문제" }, ...opts.map((o, i) => ({ text: `${i + 1}번, ${o}`, label: `${i + 1}번` }))];
+  if (withAnswer) items.push({ text: `정답은 ${opts.indexOf(q.o[0]) + 1}번, ${q.o[0]}. ${q.e}`, label: "정답과 해설" });
+  TTS.play(items);
+}
+
+/* ---------- 화면 틀 ---------- */
+let tab = "home";
+const TABS = [["home", "🏠", "홈"], ["quiz", "✏️", "문제"], ["cards", "🃏", "암기카드"], ["book", "📖", "교재"]];
+function nav() { $("#nav").innerHTML = TABS.map(([k, e, l]) => `<button class="${tab === k ? "on" : ""}" data-t="${k}"><span>${e}</span>${l}</button>`).join(""); $("#nav").querySelectorAll("button").forEach(b => b.onclick = () => go(b.dataset.t)); }
+function go(t, arg) {
+  if (mock && t !== "mock") { if (!confirm("모의고사를 그만둘까요? 지금까지 푼 것은 저장되지 않아요.")) return; mock = null; }
+  if (t !== "mock") stopMock();
+  TTS.stop(true); tab = t; nav();
+  ({ home: viewHome, quiz: viewQuizMenu, cards: viewCards, book: viewBook, session: viewSession, mock: viewMock, result: viewResult, section: viewSection })[t](arg);
+  scrollTo(0, 0);
+}
+const head = (title, sub, back) => `<header>${back ? `<button class="back" data-back="${back}">‹ 뒤로</button>` : ""}<h1>${title}</h1>${sub ? `<p>${sub}</p>` : ""}<button class="gear" data-set aria-label="설정">⚙</button></header>`;
+function wireHead() {
+  $("#view").querySelector("[data-set]")?.addEventListener("click", openSettings);
+  $("#view").querySelector("[data-back]")?.addEventListener("click", e => go(e.currentTarget.dataset.back));
+}
+
+/* ---------- 🏠 홈 ---------- */
+function viewHome() {
+  const goal = S.set.goal || 20, n = todayN(), w = wrongIds().length;
+  const dd = S.set.exam ? Math.ceil((new Date(S.set.exam + "T00:00:00") - new Date(today() + "T00:00:00")) / 864e5) : null;
+  const stats = Object.keys(SUBJ).map(s => ({ s, ...subjStat(s) }));
+  const weak = stats.filter(x => x.pct != null).sort((a, b) => a.pct - b.pct)[0];
+  $("#view").innerHTML = head("📊 CMT Level I", "2026년 12월 시험 대비 · 10주 완성") + `
+  <section class="card" style="text-align:center">
+    <div class="sm">${dd == null ? "⚙에서 시험일을 넣으면 남은 날을 알려 줘요" : dd > 0 ? "시험까지" : dd === 0 ? "오늘이 시험날이에요! 💪" : "시험일이 지났어요"}</div>
+    ${dd != null && dd > 0 ? `<div class="big" style="font-size:2.3rem;margin:4px 0">D-${dd}</div>` : ""}
+    <div class="sm" style="margin-top:4px">오늘 목표 ${goal}문제 중 <b style="color:var(--ink)">${n}개</b> 풀었어요${n >= goal ? " 🎉" : ""}</div>
+    <div class="bar" style="margin-top:8px"><i style="width:${Math.min(100, n / goal * 100)}%;background:var(--teal)"></i></div>
+  </section>
+  <button class="btn b-teal" id="hToday">🎯 오늘의 문제 풀기<small>틀린 것·안 푼 것 먼저</small></button>
+  <div class="g2"><button class="btn b-blue" id="hMock">📝 실전 모의고사<small>132문항 · 2시간</small></button>
+  <button class="btn b-orange" id="hWrong" ${w ? "" : "disabled"}>❌ 오답 노트<small>${w}문제</small></button></div>
+  <button class="btn b-purple" id="hListen">🎧 듣기 공부<small>화면 안 보고 귀로 공부해요</small></button>
+  <section class="card"><div class="t">📊 분야별 정답률 <span>목표 70%</span></div>
+    ${stats.map(x => `<div class="subj"><b>${SUBJ[x.s]}</b><div class="bar"><i style="width:${x.pct ?? 0}%;background:${x.pct == null ? "#e5e7eb" : x.pct >= 70 ? "var(--green)" : "var(--orange)"}"></i></div><span class="pct">${x.pct == null ? "–" : x.pct + "%"}</span></div>
+    <div class="sm" style="margin:2px 0 6px">${SUBJ_SUB[x.s]} · ${x.seen}/${x.tot}문제 풂${weak && weak.s === x.s && x.pct < 70 ? ` → <b style="color:#c2410c">여기부터!</b>` : ""}</div>`).join("")}
+  </section>
+  ${S.mocks.length ? `<section class="card"><div class="t">📝 최근 모의고사</div>${S.mocks.slice(-3).reverse().map(m => `<div class="row"><span class="main">${m.d.slice(5).replace("-", "/")} <span class="sm">${m.min}분</span></span><b style="color:${m.score >= 70 ? "#15803d" : "#c2410c"}">${m.score}점</b></div>`).join("")}</section>` : ""}
+  <p class="sm" style="text-align:center;line-height:1.6">문제는 「CMT Level I 주차별 문제집」 300문항, 교재는 「CMT Level I 기본 정리서」예요.<br>시험 정보는 CMT 협회 공지를 꼭 확인하세요.</p>`;
+  wireHead();
+  $("#hToday").onclick = () => startSession(todayList(), "🎯 오늘의 문제");
+  $("#hMock").onclick = () => { if (confirm("실전 모의고사를 시작할까요?\n실제 시험처럼 132문항, 2시간이에요.")) startMock(); };
+  $("#hWrong").onclick = () => startSession(shuffle(wrongIds()), "❌ 오답 노트");
+  $("#hListen").onclick = openListen;
+}
+function todayList() {
+  const need = Math.max(10, (S.set.goal || 20) - todayN());
+  const wrong = shuffle(wrongIds()), unseen = shuffle(QS.filter(q => !S.q[q.id]).map(q => q.id));
+  const old = QS.filter(q => S.q[q.id] && S.q[q.id].last === 1).sort((a, b) => S.q[a.id].t - S.q[b.id].t).map(q => q.id);
+  return [...new Set([...wrong.slice(0, Math.ceil(need / 2)), ...unseen, ...old])].slice(0, need);
+}
+
+/* ---------- ✏️ 문제 고르기 ---------- */
+let qSel = { s: "all", c: 0, mode: "mix" };
+function viewQuizMenu() {
+  const pool = poolOf();
+  const chs = [...new Set(QS.filter(q => qSel.s === "all" || q.s === qSel.s).map(q => q.c))].sort((a, b) => a - b);
+  $("#view").innerHTML = head("✏️ 문제 풀기", `모두 ${QS.length}문제`) + `
+  <section class="card"><div class="t">과목</div>
+    <div class="chips" id="cs">${[["all", "전체"], ["T", "이론·심리"], ["C", "차트·추세·패턴"], ["A", "지표·통계·사이클"], ["R", "위험·시장·윤리"]].map(([k, l]) => `<button class="chip ${qSel.s === k ? "on" : ""}" data-k="${k}">${l}</button>`).join("")}</div>
+    <div class="t mt">교재 주차 <span>골라서 풀 수 있어요</span></div>
+    <div class="chips" id="cc"><button class="chip ${!qSel.c ? "on" : ""}" data-c="0">모든 주차</button>${chs.map(c => `<button class="chip ${qSel.c === c ? "on" : ""}" data-c="${c}">${c}주차 ${esc(secTitle(c).split(/[(·]/)[0].trim())}</button>`).join("")}</div>
+    <div class="t mt">어떤 문제?</div>
+    <div class="chips" id="cm">${[["mix", "섞어서"], ["new", "안 푼 문제"], ["wrong", "틀린 문제"], ["star", "⭐ 별표"], ["order", "순서대로"]].map(([k, l]) => `<button class="chip ${qSel.mode === k ? "on" : ""}" data-m="${k}">${l}</button>`).join("")}</div>
+  </section>
+  <button class="btn b-teal" id="qGo" ${pool.length ? "" : "disabled"}>시작하기<small>${pool.length ? `${Math.min(pool.length, 20)}문제 (해당 ${pool.length}문제)` : "해당하는 문제가 없어요"}</small></button>
+  <button class="btn b-blue" id="qMock">📝 실전 모의고사 (132문항 · 2시간)</button>`;
+  wireHead();
+  $("#cs").querySelectorAll("button").forEach(b => b.onclick = () => { qSel.s = b.dataset.k; qSel.c = 0; viewQuizMenu(); });
+  $("#cc").querySelectorAll("button").forEach(b => b.onclick = () => { qSel.c = +b.dataset.c; viewQuizMenu(); });
+  $("#cm").querySelectorAll("button").forEach(b => b.onclick = () => { qSel.mode = b.dataset.m; viewQuizMenu(); });
+  $("#qGo").onclick = () => startSession(pool.slice(0, 20), qSel.s === "all" ? "✏️ 문제 풀기" : `✏️ ${SUBJ[qSel.s]}`);
+  $("#qMock").onclick = () => { if (confirm("실전 모의고사를 시작할까요?\n실제 시험처럼 132문항, 2시간이에요.")) startMock(); };
+}
+function poolOf() {
+  let l = QS.filter(q => (qSel.s === "all" || q.s === qSel.s) && (!qSel.c || q.c === qSel.c));
+  if (qSel.mode === "new") l = l.filter(q => !S.q[q.id]);
+  if (qSel.mode === "wrong") l = l.filter(q => S.q[q.id]?.last === 0);
+  if (qSel.mode === "star") l = l.filter(q => S.star.includes(q.id));
+  return (qSel.mode === "order" ? l : shuffle(l)).map(q => q.id);
+}
+
+/* ---------- 문제 풀기 화면 ---------- */
+let sess = null;
+function startSession(ids, title) {
+  if (!ids.length) return toast("풀 문제가 없어요");
+  sess = { ids, title, i: 0, res: [], opts: {}, from: ["home", "quiz", "book", "cards"].includes(tab) ? tab : "home" };
+  go("session");
+}
+function optsFor(id) { if (!sess.opts[id]) sess.opts[id] = shuffle(QBY[id].o); return sess.opts[id]; }
+function viewSession() {
+  const id = sess.ids[sess.i], q = QBY[id], opts = optsFor(id), done = sess.res[sess.i];
+  const star = S.star.includes(id);
+  $("#view").innerHTML = head(sess.title, `${SUBJ[q.s]} · ${q.c}주차`, sess.from) + `
+  <section class="card">
+    <div class="t">문제 ${sess.i + 1} / ${sess.ids.length} <span><button class="icon ${star ? "on" : ""}" id="sStar" aria-label="별표">${star ? "⭐" : "☆"}</button> <button class="icon" id="sSay" aria-label="읽어주기">🔊</button></span></div>
+    <div class="prog">${sess.ids.slice(0, 40).map((_, i) => `<i class="${sess.res[i] === true ? "r" : sess.res[i] === false ? "w" : i === sess.i ? "c" : ""}"></i>`).join("")}</div>
+    <p class="qtext">${esc(q.q)}</p>
+    ${opts.map((o, i) => `<button class="opt ${done == null ? "" : o === q.o[0] ? "ok" : sess.pick === i ? "no" : ""}" data-i="${i}" ${done == null ? "" : "disabled"}><b>${i + 1}</b><span>${esc(o)}</span></button>`).join("")}
+    ${done == null ? "" : `<div class="exp ${done ? "" : "bad"}">${done ? "✅ 맞았어요!" : "❌ 아쉬워요."} <b>정답 ${opts.indexOf(q.o[0]) + 1}번 ${esc(q.o[0])}</b><br>${esc(q.e)}<br><span class="sm">📖 교재 제${q.c}주차 ${esc(secTitle(q.c))}</span></div>
+    <div class="g2 mt"><button class="btn b-gray" id="sBook">📖 교재 보기</button><button class="btn b-teal" id="sNext">${sess.i + 1 < sess.ids.length ? "다음 ›" : "결과 보기"}</button></div>`}
+  </section>`;
+  wireHead();
+  $("#view").querySelectorAll(".opt").forEach(b => b.onclick = () => {
+    const i = +b.dataset.i, right = opts[i] === q.o[0];
+    sess.res[sess.i] = right; sess.pick = i; mark(id, right); TTS.stop(true); viewSession();
+    if (right) navigator.vibrate?.(20); else navigator.vibrate?.([30, 60, 30]);
+  });
+  $("#sSay").onclick = () => speakQuestion(q, opts, done != null);
+  $("#sStar").onclick = () => { S.star = star ? S.star.filter(x => x !== id) : [...S.star, id]; save(); viewSession(); };
+  $("#sBook") && ($("#sBook").onclick = () => go("section", { n: q.c, from: "session" }));
+  $("#sNext") && ($("#sNext").onclick = () => { sess.pick = null; if (sess.i + 1 < sess.ids.length) { sess.i++; TTS.stop(true); viewSession(); scrollTo(0, 0); } else sessionDone(); });
+}
+function sessionDone() {
+  const r = sess.res.filter(x => x === true).length, n = sess.res.filter(x => x != null).length;
+  const wrong = sess.ids.filter((id, i) => sess.res[i] === false);
+  $("#view").innerHTML = head("다 풀었어요 👏", sess.title) + `
+  <section class="card" style="text-align:center"><div class="sm">맞힌 문제</div><div class="big">${r} / ${n}</div>
+  <div class="pass" style="background:${n && r / n >= .6 ? "var(--green)" : "var(--orange)"}">정답률 ${n ? Math.round(r / n * 100) : 0}%</div>
+  <p class="sm">오늘 ${todayN()}문제 풀었어요 (목표 ${S.set.goal || 20})</p></section>
+  ${wrong.length ? `<button class="btn b-orange" id="dWrong">❌ 틀린 ${wrong.length}문제 다시 풀기</button>` : ""}
+  <button class="btn b-teal" id="dMore">🎯 다음 문제 더 풀기</button>
+  <button class="btn b-gray" id="dHome">🏠 홈으로</button>`;
+  wireHead();
+  $("#dWrong")?.addEventListener("click", () => startSession(shuffle(wrong), "❌ 틀린 문제 다시"));
+  $("#dMore").onclick = () => startSession(todayList(), "🎯 오늘의 문제");
+  $("#dHome").onclick = () => go("home");
+}
+
+/* ---------- 📝 모의고사 ---------- */
+let mock = null, mockTimer = 0;
+function startMock() {
+  const pick = (s, n) => shuffle(QS.filter(q => q.s === s)).slice(0, n).map(q => q.id);
+  const ids = [...pick("T", 26), ...pick("C", 40), ...pick("A", 40), ...pick("R", 26)];
+  mock = { ids, ans: {}, opts: Object.fromEntries(ids.map(id => [id, shuffle(QBY[id].o)])), i: 0, end: Date.now() + 120 * 60e3, start: Date.now() };
+  go("mock");
+}
+function stopMock() { clearInterval(mockTimer); }
+function viewMock() {
+  if (!mock) return go("home");
+  const id = mock.ids[mock.i], q = QBY[id], opts = mock.opts[id], a = mock.ans[id];
+  const left = Math.max(0, mock.end - Date.now()), mm = Math.floor(left / 60e3), ss = Math.floor(left / 1e3) % 60;
+  $("#view").innerHTML = `<header><h1>📝 실전 모의고사</h1><p>${SUBJ[q.s]} · <span class="timer" id="mt">${mm}:${String(ss).padStart(2, "0")}</span> 남음</p></header>
+  <section class="card">
+    <div class="t">${mock.i + 1}번 / ${mock.ids.length} <span>${Object.keys(mock.ans).length}문제 답함</span></div>
+    <p class="qtext">${esc(q.q)}</p>
+    ${opts.map((o, i) => `<button class="opt ${a === i ? "pick" : ""}" data-i="${i}"><b>${i + 1}</b><span>${esc(o)}</span></button>`).join("")}
+    <div class="g2 mt"><button class="btn b-gray" id="mPrev" ${mock.i ? "" : "disabled"}>‹ 이전</button><button class="btn b-teal" id="mNext">${mock.i < mock.ids.length - 1 ? "다음 ›" : "답안 제출"}</button></div>
+  </section>
+  <section class="card"><div class="t">답안 표 <span>번호를 누르면 이동해요</span></div>
+    <div class="grid">${mock.ids.map((x, i) => `<button class="${mock.ans[x] != null ? "d" : ""} ${i === mock.i ? "cur" : ""}" data-g="${i}">${i + 1}</button>`).join("")}</div>
+    <button class="btn b-blue mt" id="mSubmit">📤 답안 제출하고 채점</button>
+    <button class="btn b-red mt" id="mQuit">그만두기</button>
+  </section>`;
+  $("#view").querySelectorAll(".opt").forEach(b => b.onclick = () => { mock.ans[id] = +b.dataset.i; if (mock.i < mock.ids.length - 1) { mock.i++; } viewMock(); scrollTo(0, 0); });
+  $("#mPrev").onclick = () => { mock.i--; viewMock(); };
+  $("#mNext").onclick = () => { if (mock.i < mock.ids.length - 1) { mock.i++; viewMock(); scrollTo(0, 0); } else submitMock(); };
+  $("#view").querySelectorAll("[data-g]").forEach(b => b.onclick = () => { mock.i = +b.dataset.g; viewMock(); scrollTo(0, 0); });
+  $("#mSubmit").onclick = () => submitMock();
+  $("#mQuit").onclick = () => { if (confirm("모의고사를 그만둘까요?")) { mock = null; stopMock(); go("home"); } };
+  clearInterval(mockTimer);
+  mockTimer = setInterval(() => {
+    const l = mock.end - Date.now(); if (l <= 0) { clearInterval(mockTimer); toast("시간이 끝났어요. 채점할게요"); return submitMock(true); }
+    const el = $("#mt"); if (el) el.textContent = `${Math.floor(l / 60e3)}:${String(Math.floor(l / 1e3) % 60).padStart(2, "0")}`;
+  }, 1000);
+}
+let lastResult = null;
+function submitMock(force) {
+  const blank = mock.ids.length - Object.keys(mock.ans).length;
+  if (!force && !confirm(blank ? `아직 ${blank}문제를 안 풀었어요. 제출할까요?` : "답안을 제출할까요?")) return;
+  stopMock();
+  const by = { T: 0, C: 0, A: 0, R: 0 }, nn = { T: 0, C: 0, A: 0, R: 0 }, wrong = [];
+  for (const id of mock.ids) { nn[QBY[id].s]++; const right = mock.ans[id] != null && mock.opts[id][mock.ans[id]] === QBY[id].o[0]; if (right) by[QBY[id].s]++; else wrong.push(id); if (mock.ans[id] != null) mark(id, right); }
+  const correct = by.T + by.C + by.A + by.R, score = Math.round(correct / mock.ids.length * 100), min = Math.max(1, Math.round((Date.now() - mock.start) / 60e3));
+  S.mocks.push({ d: today(), score, by, min }); S.mocks = S.mocks.slice(-20); save();
+  lastResult = { correct, score, by, n: nn, min, wrong, mock }; mock = null; go("result");
+}
+function viewResult() {
+  const r = lastResult; if (!r) return go("home");
+  const pass = r.score >= 70, byCh = {};
+  for (const id of r.wrong) { const q = QBY[id]; const k = `${q.c}주차 ${secTitle(q.c)}`; byCh[k] = (byCh[k] || 0) + 1; }
+  const top = Object.entries(byCh).sort((a, b) => b[1] - a[1]).slice(0, 4);
+  $("#view").innerHTML = head("📝 모의고사 결과", "실제 시험처럼 132문항") + `
+  <section class="card" style="text-align:center"><div class="sm">내 점수 (100점 만점)</div><div class="big">${r.score}점</div>
+  <div class="pass" style="background:${pass ? "var(--green)" : "var(--orange)"}">${pass ? "합격선 근처예요 🎉" : "조금만 더! 💪"}</div>
+  <div class="sm" style="margin-top:8px">${r.correct}문항 맞음 · 합격선은 회차마다 다르지만 대략 70% 안팎 · 걸린 시간 ${r.min}분</div></section>
+  <section class="card"><div class="t">과목별 <span>과락 없음</span></div>
+  ${Object.keys(SUBJ).map(s => { const n = r.n[s] || 1; return `<div class="subj"><b>${SUBJ[s]}</b><div class="bar"><i style="width:${r.by[s] / n * 100}%;background:${r.by[s] / n >= .7 ? "var(--green)" : "var(--orange)"}"></i></div><span class="pct">${r.by[s]}/${n}</span></div>`; }).join("")}</section>
+  ${top.length ? `<section class="card"><div class="t">많이 틀린 단원</div>${top.map(([k, n]) => `<div class="row"><span class="main">${esc(k)}</span><b>${n}문제</b></div>`).join("")}
+  <button class="btn b-orange mt" id="rWrong">❌ 틀린 ${r.wrong.length}문제 해설 보며 다시 풀기</button></section>` : ""}
+  <button class="btn b-gray" id="rHome">🏠 홈으로</button>`;
+  wireHead();
+  $("#rWrong")?.addEventListener("click", () => startSession(r.wrong, "❌ 모의고사 오답"));
+  $("#rHome").onclick = () => go("home");
+}
+
+/* ---------- 🃏 암기카드 ---------- */
+let deck = "all", cardQ = [], cardI = 0, flipped = false;
+const allCards = () => [...window.CARDS, ...S.my.map(c => ({ ...c, d: "내 카드" }))];
+function buildCardQ() {
+  const l = allCards().filter(c => deck === "all" || c.d === deck);
+  const w = c => { const x = S.cards[c.id]; return x ? x.a * 2 - x.k : 1; };
+  cardQ = shuffle(l).sort((a, b) => w(b) - w(a)).map(c => c.id); cardI = 0; flipped = false;
+}
+function viewCards() {
+  if (!cardQ.length) buildCardQ();
+  const decks = [...new Set(allCards().map(c => c.d))];
+  const c = allCards().find(x => x.id === cardQ[cardI]);
+  const known = allCards().filter(x => (deck === "all" || x.d === deck) && S.cards[x.id] && S.cards[x.id].k > S.cards[x.id].a).length;
+  $("#view").innerHTML = head("🃏 암기카드", `외운 카드 ${known} / ${cardQ.length}`) + `
+  <div class="chips" style="justify-content:center">${[["all", "전체"], ...decks.map(d => [d, d])].map(([k, l]) => `<button class="chip ${deck === k ? "on" : ""}" data-d="${esc(k)}">${esc(l)}</button>`).join("")}</div>
+  ${c ? `<section class="card flash" id="fc"><div class="sm">${esc(c.d)} · ${cardI + 1} / ${cardQ.length} · ${flipped ? "답" : "눌러서 뒤집기"}</div>
+    <div class="front">${esc(c.f)}</div>
+    ${flipped ? `<div class="lines">${c.b.map(x => `<div>${esc(x)}</div>`).join("")}</div>` : `<div style="font-size:2.4rem;margin-top:10px">🤔</div>`}
+  </section>
+  <div class="g3"><button class="btn b-gray" id="kAgain">😅<small>다시 볼래요</small></button><button class="btn b-gray" id="kSay">🔊<small>읽어주기</small></button><button class="btn b-teal" id="kOk">😊<small>외웠어요</small></button></div>
+  <p class="sm" style="text-align:center;margin:0">"다시 볼래요"를 누른 카드는 더 자주 나와요</p>` : `<section class="card"><p class="sm">카드가 없어요.</p></section>`}
+  <button class="btn b-purple" id="kAdd">＋ 내 카드 만들기<small>KS K 0021:2024 원문 정의 등을 직접 넣어요</small></button>
+  ${S.my.length ? `<section class="card"><div class="t">내 카드 ${S.my.length}장</div>${S.my.map(m => `<div class="row"><span class="main">${esc(m.f)}</span><button class="icon" data-del="${m.id}">🗑️</button></div>`).join("")}</section>` : ""}`;
+  wireHead();
+  $("#view").querySelectorAll("[data-d]").forEach(b => b.onclick = () => { deck = b.dataset.d; buildCardQ(); viewCards(); });
+  if (c) {
+    $("#fc").onclick = () => { flipped = !flipped; viewCards(); };
+    const step = ok => { const x = S.cards[c.id] || (S.cards[c.id] = { k: 0, a: 0 }); ok ? x.k++ : x.a++; save(); TTS.stop(true);
+      if (!ok) { const id = cardQ.splice(cardI, 1)[0]; cardQ.splice(Math.min(cardQ.length, cardI + 3), 0, id); } else cardI++;
+      if (cardI >= cardQ.length) { toast("한 바퀴 다 봤어요 👏 다시 섞을게요"); buildCardQ(); }
+      flipped = false; viewCards(); };
+    $("#kAgain").onclick = () => step(false); $("#kOk").onclick = () => step(true);
+    $("#kSay").onclick = () => { flipped = true; viewCards(); TTS.play([{ text: c.f, label: "앞면" }, ...c.b.map(x => ({ text: x, label: "답" }))]); };
+  }
+  $("#kAdd").onclick = () => modal("＋ 내 카드 만들기", `
+    <label class="lab" style="margin-top:0">앞면 (질문)</label><input class="inp" id="mf" placeholder="예: 켈리 공식은?">
+    <label class="lab">뒷면 (답) — 한 줄에 하나씩</label><textarea class="inp" id="mb" placeholder="정의를 줄마다 써 주세요"></textarea>
+    <p class="sm">KS K 0021:2024 원문은 e나라표준인증(standard.go.kr)에서 볼 수 있어요. 교재에는 95℃ 정의만 나와 있어서, 나머지 기호는 원문을 보고 직접 넣어 두면 좋아요.</p>
+    <button class="btn b-teal" id="msave">저장</button>`, (m, close) => {
+    m.querySelector("#msave").onclick = () => {
+      const f = m.querySelector("#mf").value.trim(), b = m.querySelector("#mb").value.split("\n").map(x => x.trim()).filter(Boolean);
+      if (!f || !b.length) return toast("앞면과 뒷면을 모두 써 주세요");
+      S.my.push({ id: "m" + Date.now().toString(36), f, b }); save(); close(); deck = "내 카드"; buildCardQ(); viewCards(); toast("카드를 만들었어요");
+    };
+  });
+  $("#view").querySelectorAll("[data-del]").forEach(b => b.onclick = () => { if (!confirm("이 카드를 지울까요?")) return; S.my = S.my.filter(x => x.id !== b.dataset.del); save(); buildCardQ(); viewCards(); });
+}
+
+/* ---------- 📖 교재 ---------- */
+function viewBook() {
+  $("#view").innerHTML = head("📖 교재", "CMT Level I 기본 정리서 · 제1주차~제10주차") + `
+  <section class="card">${BOOK.map(s => { const nq = QS.filter(q => q.c === s.n).length;
+    return `<button class="sec" data-n="${s.n}"><span class="n">${s.n}</span><b>${esc(s.title)}<br><span class="sm">${nq ? `문제 ${nq}개 · ` : ""}요점 ${s.blocks.filter(b => KEYK.includes(b.k)).length}개</span></b><span class="sm">›</span></button>`; }).join("")}</section>
+  <button class="btn b-purple" id="bAll">🎧 요점만 모아 듣기</button>`;
+  wireHead();
+  $("#view").querySelectorAll("[data-n]").forEach(b => b.onclick = () => go("section", { n: +b.dataset.n }));
+  $("#bAll").onclick = () => listenPoints();
+}
+let secOnly = false;
+function viewSection(arg) {
+  const s = BOOK.find(x => x.n === arg.n), from = arg.from || "book";
+  const blocks = s.blocks.filter(b => !secOnly || KEYK.includes(b.k));
+  const html = blocks.map((b, i) => {
+    if (b.t === "h2") return `<h2 data-r="${i}">${esc(b.x)}</h2>`;
+    if (b.t === "h3") return `<h3 data-r="${i}">${esc(b.x)}</h3>`;
+    if (b.t === "h4") return `<h4 data-r="${i}">${esc(b.x)}</h4>`;
+    if (b.t === "li") return `<div class="li" data-r="${i}">${esc(b.x)}</div>`;
+    if (b.t === "p") return `<p data-r="${i}">${esc(b.x)}</p>`;
+    if (b.t === "box") return `<div class="bx ${b.k.split(" ")[0]}" data-r="${i}"><span class="k">${esc(b.k)}</span>${esc(b.x)}</div>`;
+    if (b.t === "table") return `<div class="tw" data-r="${i}"><table><tr>${b.rows[0].map(c => `<th>${esc(c)}</th>`).join("")}</tr>${b.rows.slice(1).map(r => `<tr>${r.map(c => `<td>${esc(c)}</td>`).join("")}</tr>`).join("")}</table></div>`;
+    return "";
+  }).join("");
+  const nq = QS.filter(q => q.c === s.n).length;
+  $("#view").innerHTML = head(`제${s.n}주차`, esc(s.title), from === "session" ? "session" : "book") + `
+  <div class="g2"><button class="btn b-purple" id="sListen">🔊 이 주차 듣기</button><button class="btn ${secOnly ? "b-teal" : "b-gray"}" id="sOnly">${secOnly ? "✓ 요점만" : "🎯 요점만"}</button></div>
+  <p class="sm" style="text-align:center;margin:0">글을 누르면 그 줄부터 읽어 줘요</p>
+  <section class="card book">${html || `<p class="sm">시험 포인트가 없는 주차예요.</p>`}</section>
+  ${nq ? `<button class="btn b-teal" id="sQuiz">✏️ 이 주차 문제 ${nq}개 풀기</button>` : ""}
+  <div class="g2">${s.n > 1 ? `<button class="btn b-gray" id="sPrev">‹ ${s.n - 1}주차</button>` : "<span></span>"}${s.n < BOOK.length ? `<button class="btn b-gray" id="sNextSec">${s.n + 1}주차 ›</button>` : ""}</div>`;
+  wireHead();
+  const items = from => blocks.map((b, i) => ({ b, i })).slice(from).filter(({ b }) => b.t !== "table").map(({ b, i }) => ({
+    text: b.t === "box" ? `${b.k}. ${b.x}` : b.x, el: $(`#view [data-r="${i}"]`), label: (b.x || "").slice(0, 36), pause: b.t.startsWith("h") ? 450 : 300 }));
+  $("#sListen").onclick = () => TTS.play(items(0));
+  $("#view").querySelectorAll(".book [data-r]").forEach(el => el.onclick = () => { const i = +el.dataset.r; TTS.play(items(i)); });
+  $("#sOnly").onclick = () => { secOnly = !secOnly; viewSection(arg); };
+  $("#sQuiz")?.addEventListener("click", () => startSession(shuffle(QS.filter(q => q.c === s.n).map(q => q.id)).slice(0, 20), `✏️ ${s.n}주차 문제`));
+  $("#sPrev")?.addEventListener("click", () => go("section", { n: s.n - 1 }));
+  $("#sNextSec")?.addEventListener("click", () => go("section", { n: s.n + 1 }));
+}
+
+/* ---------- 🎧 듣기 공부 ---------- */
+function listenPoints() {
+  const pts = BOOK.flatMap(s => s.blocks.filter(b => KEYK.includes(b.k)).map((b, i) => ({ s, b })));
+  TTS.play(pts.map(({ s, b }, i) => ({ text: (i === 0 || pts[i - 1].s !== s ? `제${s.n}주차, ${s.title}. ` : "") + b.x, label: `🎯 ${s.n}주차 요점 (${i + 1}/${pts.length})`, pause: 700 })));
+}
+function openListen() {
+  let mode = "point", subj = "all", dk = "all", n = 10;
+  const decks = [...new Set(allCards().map(c => c.d))];
+  const w = modal("🎧 듣기 공부", `<div id="lb"></div>`, (m) => {
+    const draw = () => {
+      m.querySelector("#lb").innerHTML = `
+      <div class="chips">${[["point", "🎯 요점 듣기"], ["quiz", "✏️ 문제 듣기"], ["card", "🃏 암기카드"]].map(([k, l]) => `<button class="chip ${mode === k ? "on" : ""}" data-m="${k}">${l}</button>`).join("")}</div>
+      <p class="sm">${mode === "point" ? "교재의 시험 포인트와 주차 핵심 요약을 1주차부터 차례로 읽어 줘요." : mode === "quiz" ? "문제와 보기를 읽고 <b>5초</b> 쉰 뒤(속으로 답 생각하기) 정답과 해설을 읽어 줘요." : "카드 앞면을 읽고 3초 쉰 뒤 답을 읽어 줘요."}</p>
+      ${mode === "quiz" ? `<div class="chips">${[["all", "전체"], ["T", "이론·심리"], ["C", "차트·추세·패턴"], ["A", "지표·통계·사이클"], ["R", "위험·시장·윤리"], ["wrong", "틀린 문제"]].map(([k, l]) => `<button class="chip ${subj === k ? "on" : ""}" data-s="${k}">${l}</button>`).join("")}</div>
+      <div class="chips mt">${[10, 20, 30].map(k => `<button class="chip ${n === k ? "on" : ""}" data-n="${k}">${k}문제</button>`).join("")}</div>` : ""}
+      ${mode === "card" ? `<div class="chips">${[["all", "전체"], ...decks.map(d => [d, d])].map(([k, l]) => `<button class="chip ${dk === k ? "on" : ""}" data-k="${esc(k)}">${esc(l)}</button>`).join("")}</div>` : ""}
+      <label class="lab">읽는 속도</label>
+      <div class="chips">${[[0.8, "느리게"], [1, "보통"], [1.1, "조금 빠르게"], [1.2, "빠르게"]].map(([k, l]) => `<button class="chip ${S.set.rate === k ? "on" : ""}" data-r="${k}">${l}</button>`).join("")}</div>
+      <div class="now" id="now">▶ 시작을 누르세요</div>
+      <div class="g2 mt"><button class="btn b-purple" id="lPlay">▶ 시작</button><button class="btn b-gray" id="lStop">⏹ 멈춤</button></div>
+      <p class="sm" style="line-height:1.6">📱 아이폰은 화면이 꺼지면 읽기가 멈춰요. 듣는 동안 화면이 켜져 있게 해 볼게요.<br>소리가 안 나면 무음 스위치와 볼륨을 확인하고, 카톡 안이 아닌 사파리·크롬에서 열어 주세요.</p>`;
+      m.querySelectorAll("[data-m]").forEach(b => b.onclick = () => { mode = b.dataset.m; draw(); });
+      m.querySelectorAll("[data-s]").forEach(b => b.onclick = () => { subj = b.dataset.s; draw(); });
+      m.querySelectorAll("[data-n]").forEach(b => b.onclick = () => { n = +b.dataset.n; draw(); });
+      m.querySelectorAll("[data-k]").forEach(b => b.onclick = () => { dk = b.dataset.k; draw(); });
+      m.querySelectorAll("[data-r]").forEach(b => b.onclick = () => { S.set.rate = +b.dataset.r; save(); draw(); });
+      const show = t => () => { const el = m.querySelector("#now"); if (el) el.innerHTML = t; };
+      m.querySelector("#lStop").onclick = () => TTS.stop();
+      m.querySelector("#lPlay").onclick = () => {
+        let items = [];
+        if (mode === "point") {
+          const pts = BOOK.flatMap(s => s.blocks.filter(b => KEYK.includes(b.k)).map(b => ({ s, b })));
+          items = pts.map(({ s, b }, i) => ({ text: (i === 0 || pts[i - 1].s !== s ? `제${s.n}주차. ` : "") + b.x, label: `🎯 ${s.n}주차 (${i + 1}/${pts.length})`, pause: 700, onShow: show(`<span class="sm">🎯 제${s.n}주차 ${esc(s.title)} · ${i + 1}/${pts.length}</span><br>${esc(b.x)}`) }));
+        } else if (mode === "quiz") {
+          const ids = subj === "wrong" ? shuffle(wrongIds()) : shuffle(QS.filter(q => subj === "all" || q.s === subj).map(q => q.id));
+          if (!ids.length) return toast("틀린 문제가 없어요");
+          ids.slice(0, n).forEach((id, k) => { const q = QBY[id], o = shuffle(q.o), ans = o.indexOf(q.o[0]) + 1;
+            const qShow = show(`<span class="sm">✏️ ${k + 1}/${Math.min(n, ids.length)} · ${SUBJ[q.s]}</span><br><b>${esc(q.q)}</b><br>${o.map((x, j) => `${j + 1}. ${esc(x)}`).join("<br>")}`);
+            items.push({ text: `${k + 1}번 문제. ${q.q}`, label: `✏️ ${k + 1}번 문제`, onShow: qShow, pause: 200 });
+            o.forEach((x, j) => items.push({ text: `${j + 1}번, ${x}`, label: `✏️ ${k + 1}번 문제`, pause: j === 3 ? 5000 : 250 }));
+            items.push({ text: `정답은 ${ans}번, ${q.o[0]}. ${q.e}`, label: `✅ 정답 ${ans}번`, pause: 1200, onShow: show(`<span class="sm">✅ 정답</span><br><b>${ans}번 ${esc(q.o[0])}</b><br>${esc(q.e)}`) });
+          });
+        } else {
+          const cs = shuffle(allCards().filter(c => dk === "all" || c.d === dk));
+          cs.forEach((c, k) => { items.push({ text: c.f, label: `🃏 ${k + 1}/${cs.length}`, pause: 3000, onShow: show(`<span class="sm">🃏 ${esc(c.d)} · ${k + 1}/${cs.length}</span><br><b>${esc(c.f)}</b>`) });
+            items.push({ text: c.b.join(". "), label: `🃏 답`, pause: 1200, onShow: show(`<b>${esc(c.f)}</b><br>${c.b.map(esc).join("<br>")}`) }); });
+        }
+        TTS.play(items, show("⏹ 멈췄어요. ▶ 시작을 누르면 처음부터 다시 읽어요."));
+      };
+    };
+    draw();
+  });
+  w.onclose = () => TTS.stop(true);
+}
+
+/* ---------- ⚙ 설정 ---------- */
+function openSettings() {
+  const vs = TTS.ok ? speechSynthesis.getVoices().filter(v => /^ko/i.test(v.lang)) : [];
+  const solved = Object.keys(S.q).length;
+  modal("⚙ 설정", `
+    <label class="lab" style="margin-top:0">📅 시험일</label><div style="overflow:hidden;border-radius:12px"><input class="inp" type="date" id="sExam" value="${esc(S.set.exam)}"></div>
+    <label class="lab">🎯 하루 목표</label>
+    <div class="chips" id="sGoal">${[10, 20, 30, 50].map(k => `<button class="chip ${S.set.goal === k ? "on" : ""}" data-g="${k}">${k}문제</button>`).join("")}</div>
+    <label class="lab">🔊 목소리</label>
+    ${vs.length ? `<select class="inp" id="sVoice">${vs.map(v => `<option ${v.name === (TTS.voice()?.name) ? "selected" : ""}>${esc(v.name)}</option>`).join("")}</select>` : `<p class="sm">한국어 목소리를 찾지 못했어요. 휴대폰 설정 → 손쉬운 사용(아이폰) 또는 텍스트 음성 변환(갤럭시)에서 한국어 음성을 받아 주세요.</p>`}
+    <div class="chips mt">${[[0.8, "느리게"], [1, "보통"], [1.1, "조금 빠르게"], [1.2, "빠르게"]].map(([k, l]) => `<button class="chip ${S.set.rate === k ? "on" : ""}" data-r="${k}">${l}</button>`).join("")}</div>
+    <button class="btn b-gray mt" id="sTest">🔊 목소리 들어 보기</button>
+    <label class="lab">💾 백업 (푼 기록 ${solved}문제)</label>
+    <button class="btn b-kakao" id="sBk">💬 카톡으로 백업 보내기</button>
+    <div class="g2 mt"><button class="btn b-gray" id="sSave">💾 파일로 저장</button><button class="btn b-gray" id="sLoad">📂 불러오기</button></div>
+    <button class="btn b-red mt" id="sReset">🗑️ 푼 기록 모두 지우기</button>
+    <p class="sm" style="line-height:1.6;margin-top:12px">기록은 이 휴대폰에만 저장돼요. 로그인은 없어요.<br>📲 홈 화면에 추가: 아이폰은 사파리 → 공유 → 홈 화면에 추가, 갤럭시는 크롬 → ⋮ → 홈 화면에 추가</p>`, (m, close) => {
+    m.querySelector("#sExam").onchange = e => { S.set.exam = e.target.value; save(); };
+    m.querySelectorAll("[data-g]").forEach(b => b.onclick = () => { S.set.goal = +b.dataset.g; save(); m.querySelectorAll("[data-g]").forEach(x => x.classList.toggle("on", x === b)); });
+    m.querySelectorAll("[data-r]").forEach(b => b.onclick = () => { S.set.rate = +b.dataset.r; save(); m.querySelectorAll("[data-r]").forEach(x => x.classList.toggle("on", x === b)); });
+    m.querySelector("#sVoice")?.addEventListener("change", e => { S.set.voice = e.target.value; save(); });
+    m.querySelector("#sTest").onclick = () => TTS.play([{ text: "안녕하세요. CMT 레벨 원 공부를 시작해 볼까요? 기술적 분석의 3대 전제는 시장 반영, 추세, 역사 반복이에요." }]);
+    const file = () => new File([JSON.stringify({ app: "cmt-study", savedAt: new Date().toISOString(), ...S })], `CMT공부-백업-${today().replaceAll("-", "")}.json`, { type: "application/json" });
+    const dl = f => { const u = URL.createObjectURL(f), a = document.createElement("a"); a.href = u; a.download = f.name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(u), 4000); };
+    m.querySelector("#sBk").onclick = async () => { const f = file(); if (navigator.canShare?.({ files: [f] })) { try { await navigator.share({ files: [f], title: "CMT 공부 백업" }); return; } catch (e) { if (e.name === "AbortError") return; } } dl(f); toast("파일로 저장했어요. 그 파일을 카톡으로 보내 주세요"); };
+    m.querySelector("#sSave").onclick = () => dl(file());
+    m.querySelector("#sLoad").onclick = () => { const i = document.createElement("input"); i.type = "file"; i.accept = ".json,application/json";
+      i.onchange = async () => { try { const j = JSON.parse(await i.files[0].text()); if (j.app !== "cmt-study") throw 0;
+        if (!confirm(`푼 기록 ${Object.keys(j.q || {}).length}문제가 든 백업이에요. 지금 기록을 바꿀까요?`)) return;
+        delete j.app; delete j.savedAt; S = Object.assign(def(), j); S.set = Object.assign(def().set, j.set); save(); close(); go("home"); toast("불러왔어요"); } catch { toast("CMT 공부 백업 파일이 아니에요"); } }; i.click(); };
+    m.querySelector("#sReset").onclick = () => { if (!confirm("푼 기록, 오답, 별표, 카드 기록을 모두 지울까요?\n(시험일·설정·내 카드는 남아요)")) return; S.q = {}; S.star = []; S.cards = {}; S.day = { d: "", n: 0 }; S.mocks = []; save(); close(); go("home"); toast("기록을 지웠어요"); };
+  });
+}
+
+go("home");
+if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});
+</script>
+</body>
+</html>
