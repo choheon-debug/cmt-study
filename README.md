@@ -9,3 +9,4 @@ CMT Level I(2026년 12월 시험 대비) 공부용 휴대폰 웹앱.
 
 기록은 이 기기(localStorage)에만 저장됩니다.
 배포: GitHub Pages → https://choheon-debug.github.io/cmt-study/
+사용설명서: https://choheon-debug.github.io/cmt-study/guide.html
