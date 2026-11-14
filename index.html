@@ -662,7 +662,7 @@ function hlApplySel(c) {
     if (r[1] > e) out.push([e, r[1], r[2], (r[3] || "").slice(e - r[0])]); }
   if (c) out.push([s, e, c, txt]);
   if (out.length) R[k] = out.sort((a, b) => a[0] - b[0]); else delete R[k];
-  save(); try { getSelection().removeAllRanges(); } catch {} hlPop(false); if (el.isConnected) hlRefresh(el);
+  save(); try { getSelection().removeAllRanges(); } catch {} hlPop(false); document.querySelectorAll("[data-hk]").forEach(x => { if (x.dataset.hk === k) hlRefresh(x); });
   if (c) toast("칠했어요 🖍"); else toast("지웠어요");
 }
 let hlT0 = 0;
