@@ -330,7 +330,7 @@ function speakQuestion(q, opts, withAnswer) {
 
 /* ---------- 화면 틀 ---------- */
 let tab = "home";
-const TABS = [["home", "🏠", "홈"], ["quiz", "✏️", "문제"], ["cards", "🃏", "암기카드"], ["mind", "🧠", "마인드맵"], ["book", "📖", "교재"]];
+const TABS = [["home", "🏠", "홈"], ["mind", "🧠", "마인드맵"], ["quiz", "✏️", "문제"], ["cards", "🃏", "암기카드"], ["book", "📖", "교재"]];
 function nav() { $("#nav").innerHTML = TABS.map(([k, e, l]) => `<button class="${tab === k || ({ msec: "mind", section: "book" })[tab] === k ? "on" : ""}" data-t="${k}"><span>${e}</span>${l}</button>`).join(""); $("#nav").querySelectorAll("button").forEach(b => b.onclick = () => go(b.dataset.t)); }
 function go(t, arg) {
   if (t !== tab) hlMode = false;
