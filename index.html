@@ -105,7 +105,7 @@ textarea.inp{min-height:5rem;resize:vertical;line-height:1.5}
 .book table{border-collapse:collapse;font-size:.86rem;line-height:1.45;min-width:100%}
 .book th,.book td{border:1px solid #d1d5db;padding:6px 7px;text-align:left;vertical-align:top}
 .book th{background:#f0fdfa;white-space:nowrap}
-.reading{background:#fef08a!important;box-shadow:0 0 0 3px #fef08a}
+.reading{background:#ccfbf1!important;box-shadow:0 0 0 3px #5eead4}
 .player{position:fixed;left:0;right:0;bottom:calc(env(safe-area-inset-bottom,0px) + 82px);z-index:25;display:flex;justify-content:center;padding:0 12px;pointer-events:none}
 .player div{pointer-events:auto;background:#0f766e;color:#fff;border-radius:16px;box-shadow:0 6px 18px rgb(0 0 0 / .25);padding:8px 8px 8px 14px;display:flex;align-items:center;gap:8px;max-width:34rem;width:100%}
 .player span{flex:1;font-size:.88rem;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
@@ -128,6 +128,13 @@ textarea.inp{min-height:5rem;resize:vertical;line-height:1.5}
 .row .main{flex:1;min-width:0}
 .now{background:#f0fdfa;border-radius:14px;padding:14px;min-height:120px;line-height:1.65;font-size:1.05rem;margin-top:10px}
 @media (min-width:900px){.wrap,.nav nav{max-width:44rem}}
+.hl-y{background:#fde047!important;color:var(--ink)!important}.hl-p{background:#f9a8d4!important;color:var(--ink)!important}.hl-g{background:#86efac!important;color:var(--ink)!important}.hl-b{background:#93c5fd!important;color:var(--ink)!important}
+.hlbar .btn{padding:11px 10px}.hlc{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:6px}
+.hlc button{border:0;border-radius:12px;padding:10px 0;font-weight:800;color:var(--ink);font-size:.9rem}.hlc button.on{outline:3px solid #111827;outline-offset:1px}
+.hli{display:block;width:100%;text-align:left;background:#fff;border:1px solid var(--line);border-left:8px solid;border-radius:12px;padding:9px 11px;margin:6px 0;line-height:1.5;font-size:.95rem;color:var(--ink)}
+.book [data-hk]{-webkit-user-select:text;user-select:text}
+mark.hlm{color:inherit;border-radius:4px;padding:0 1px}
+#hlpop{position:fixed;left:10px;right:10px;bottom:calc(env(safe-area-inset-bottom,0px) + 150px);z-index:70;max-width:30rem;margin:0 auto;background:#1f2937;border-radius:16px;padding:10px;box-shadow:0 8px 24px rgb(0 0 0 / .35)}
 </style>
 </head>
 <body>
@@ -143,7 +150,7 @@ textarea.inp{min-height:5rem;resize:vertical;line-height:1.5}
 const KEY = "cmt.v1";
 const SUBJ = { T: "이론·심리", C: "차트·추세·패턴", A: "지표·통계·사이클", R: "위험·시장·윤리" };
 const SUBJ_SUB = { T: "1~2주차: 기초·다우 이론·EMH·행동재무학", C: "3~5주차: 차트·캔들·P&F·추세·패턴", A: "6~8주차: 지표·거래량·통계·사이클·시스템", R: "9~10주차: 위험관리·금융상품·상대강도·윤리" };
-const def = () => ({ q: {}, star: [], cards: {}, day: { d: "", n: 0 }, set: { exam: "", goal: 20, rate: 1, voice: "" }, mocks: [], my: [] });
+const def = () => ({ q: {}, star: [], cards: {}, day: { d: "", n: 0 }, set: { exam: "", goal: 20, rate: 1, voice: "" }, mocks: [], my: [], hl: {} });
 let S = def();
 try { const raw = localStorage.getItem(KEY); if (raw) S = Object.assign(def(), JSON.parse(raw)); S.set = Object.assign(def().set, S.set); } catch {}
 function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch { toast("저장 공간이 꽉 찼어요"); } }
@@ -268,6 +275,7 @@ let tab = "home";
 const TABS = [["home", "🏠", "홈"], ["quiz", "✏️", "문제"], ["cards", "🃏", "암기카드"], ["book", "📖", "교재"]];
 function nav() { $("#nav").innerHTML = TABS.map(([k, e, l]) => `<button class="${tab === k ? "on" : ""}" data-t="${k}"><span>${e}</span>${l}</button>`).join(""); $("#nav").querySelectorAll("button").forEach(b => b.onclick = () => go(b.dataset.t)); }
 function go(t, arg) {
+  if (t !== tab) hlMode = false;
   if (mock && t !== "mock") { if (!confirm("모의고사를 그만둘까요? 지금까지 푼 것은 저장되지 않아요.")) return; mock = null; }
   if (t !== "mock") stopMock();
   TTS.stop(true); tab = t; nav();
@@ -513,42 +521,163 @@ function viewBook() {
   $("#view").innerHTML = head("📖 교재", "CMT Level I 기본 정리서 · 제1주차~제10주차") + `
   <section class="card">${BOOK.map(s => { const nq = QS.filter(q => q.c === s.n).length;
     return `<button class="sec" data-n="${s.n}"><span class="n">${s.n}</span><b>${esc(s.title)}<br><span class="sm">${nq ? `문제 ${nq}개 · ` : ""}요점 ${s.blocks.filter(b => KEYK.includes(b.k)).length}개</span></b><span class="sm">›</span></button>`; }).join("")}</section>
-  <button class="btn b-purple" id="bAll">🎧 요점만 모아 듣기</button>`;
+  <button class="btn b-purple" id="bAll">🎧 요점만 모아 듣기</button>
+  <button class="btn b-orange" id="bHl">🖍 내 하이라이트<small>칠한 곳 ${hlCount("")}개 모아 보기·듣기</small></button>`;
   wireHead();
   $("#view").querySelectorAll("[data-n]").forEach(b => b.onclick = () => go("section", { n: +b.dataset.n }));
   $("#bAll").onclick = () => listenPoints();
+  $("#bHl").onclick = openHl;
 }
 let secOnly = false;
 function viewSection(arg) {
   const s = BOOK.find(x => x.n === arg.n), from = arg.from || "book";
   const blocks = s.blocks.filter(b => !secOnly || KEYK.includes(b.k));
+  const bk = b => `b${s.n}:${s.blocks.indexOf(b)}`, hc = b => hlCls(bk(b));
   const html = blocks.map((b, i) => {
-    if (b.t === "h2") return `<h2 data-r="${i}">${esc(b.x)}</h2>`;
-    if (b.t === "h3") return `<h3 data-r="${i}">${esc(b.x)}</h3>`;
-    if (b.t === "h4") return `<h4 data-r="${i}">${esc(b.x)}</h4>`;
-    if (b.t === "li") return `<div class="li" data-r="${i}">${esc(b.x)}</div>`;
-    if (b.t === "p") return `<p data-r="${i}">${esc(b.x)}</p>`;
-    if (b.t === "box") return `<div class="bx ${b.k.split(" ")[0]}" data-r="${i}"><span class="k">${esc(b.k)}</span>${esc(b.x)}</div>`;
-    if (b.t === "table") return `<div class="tw" data-r="${i}"><table><tr>${b.rows[0].map(c => `<th>${esc(c)}</th>`).join("")}</tr>${b.rows.slice(1).map(r => `<tr>${r.map(c => `<td>${esc(c)}</td>`).join("")}</tr>`).join("")}</table></div>`;
+    if (b.t === "h2") return `<h2 data-r="${i}" data-hk="${bk(b)}" class="${hc(b)}">${esc(b.x)}</h2>`;
+    if (b.t === "h3") return `<h3 data-r="${i}" data-hk="${bk(b)}" class="${hc(b)}">${esc(b.x)}</h3>`;
+    if (b.t === "h4") return `<h4 data-r="${i}" data-hk="${bk(b)}" class="${hc(b)}">${esc(b.x)}</h4>`;
+    if (b.t === "li") return `<div class="li${hc(b)}" data-r="${i}" data-hk="${bk(b)}">${esc(b.x)}</div>`;
+    if (b.t === "p") return `<p data-r="${i}" data-hk="${bk(b)}" class="${hc(b)}">${esc(b.x)}</p>`;
+    if (b.t === "box") return `<div class="bx ${b.k.split(" ")[0]}${hc(b)}" data-r="${i}" data-hk="${bk(b)}"><span class="k">${esc(b.k)}</span>${esc(b.x)}</div>`;
+    if (b.t === "table") return `<div class="tw" data-r="${i}" data-hk="${bk(b)}"><table><tr>${b.rows[0].map(c => `<th>${esc(c)}</th>`).join("")}</tr>${b.rows.slice(1).map(r => `<tr>${r.map(c => `<td>${esc(c)}</td>`).join("")}</tr>`).join("")}</table></div>`;
     return "";
   }).join("");
   const nq = QS.filter(q => q.c === s.n).length;
   $("#view").innerHTML = head(`제${s.n}주차`, esc(s.title), from === "session" ? "session" : "book") + `
   <div class="g2"><button class="btn b-purple" id="sListen">🔊 이 주차 듣기</button><button class="btn ${secOnly ? "b-teal" : "b-gray"}" id="sOnly">${secOnly ? "✓ 요점만" : "🎯 요점만"}</button></div>
-  <p class="sm" style="text-align:center;margin:0">글을 누르면 그 줄부터 읽어 줘요</p>
+  ${hlBar()}
+  <p class="sm" style="text-align:center;margin:0">${hlMode ? "칠하기 중에는 읽어 주지 않아요" : "글을 누르면 그 줄부터 읽어 줘요"}</p>
   <section class="card book">${html || `<p class="sm">시험 포인트가 없는 주차예요.</p>`}</section>
   ${nq ? `<button class="btn b-teal" id="sQuiz">✏️ 이 주차 문제 ${nq}개 풀기</button>` : ""}
   <div class="g2">${s.n > 1 ? `<button class="btn b-gray" id="sPrev">‹ ${s.n - 1}주차</button>` : "<span></span>"}${s.n < BOOK.length ? `<button class="btn b-gray" id="sNextSec">${s.n + 1}주차 ›</button>` : ""}</div>`;
   wireHead();
   const items = from => blocks.map((b, i) => ({ b, i })).slice(from).filter(({ b }) => b.t !== "table").map(({ b, i }) => ({
-    text: b.t === "box" ? `${b.k}. ${b.x}` : b.x, el: $(`#view [data-r="${i}"]`), label: (b.x || "").slice(0, 36), pause: b.t.startsWith("h") ? 450 : 300 }));
+    text: b.t === "box" ? `${b.k}. ${b.x}` : b.x, el: $(`#view [data-r="${i}" data-hk="${bk(b)}"]`), label: (b.x || "").slice(0, 36), pause: b.t.startsWith("h") ? 450 : 300 }));
   $("#sListen").onclick = () => TTS.play(items(0));
-  $("#view").querySelectorAll(".book [data-r]").forEach(el => el.onclick = () => { const i = +el.dataset.r; TTS.play(items(i)); });
+  wireHl(() => keepY(() => viewSection(arg)));
+  $("#view").querySelectorAll(".book [data-r]").forEach(el => el.onclick = () => { const i = +el.dataset.r;
+    if (hlMode) { if (blocks[i].t !== "table") { hlSet(bk(blocks[i]), hlColor); keepY(() => viewSection({ ...arg, focus: undefined })); } return; }
+    TTS.play(items(i)); });
+  if (arg.focus != null) setTimeout(() => { const j = blocks.indexOf(s.blocks[arg.focus]), el = $(`#view [data-r="${j}"]`); if (el) { el.scrollIntoView({ block: "center" }); el.classList.add("reading"); setTimeout(() => el.classList.remove("reading"), 2500); } }, 30);
   $("#sOnly").onclick = () => { secOnly = !secOnly; viewSection(arg); };
   $("#sQuiz")?.addEventListener("click", () => startSession(shuffle(QS.filter(q => q.c === s.n).map(q => q.id)).slice(0, 20), `✏️ ${s.n}주차 문제`));
   $("#sPrev")?.addEventListener("click", () => go("section", { n: s.n - 1 }));
   $("#sNextSec")?.addEventListener("click", () => go("section", { n: s.n + 1 }));
 }
+
+/* ---------- 🖍 하이라이트 (이 기기에만 저장) ---------- */
+const HLC = { y: ["노랑", "#fde047"], p: ["분홍", "#f9a8d4"], g: ["초록", "#86efac"], b: ["하늘", "#93c5fd"] };
+let hlMode = false, hlColor = "y";
+const hlAll = () => (S.hl = S.hl || {});
+const hlCls = k => { const c = hlAll()[k]; return c ? ` hl-${c}` : ""; };
+function hlSet(k, c) { const h = hlAll(); if (!c || h[k] === c) delete h[k]; else h[k] = c; save(); }
+const hlCount = pre => Object.keys(hlAll()).filter(k => k.startsWith(pre)).length;
+function hlBar() {
+  return `<div class="hlbar"><button class="btn ${hlMode ? "b-orange" : "b-gray"}" id="hlT">🖍 ${hlMode ? "칠하기 켜짐 · 다 칠했으면 누르세요" : "하이라이트 칠하기"}</button>
+  ${hlMode ? `<div class="hlc">${Object.entries(HLC).map(([k, [l, c]]) => `<button data-hc="${k}" class="${hlColor === k ? "on" : ""}" style="background:${c}">${l}</button>`).join("")}</div>
+  <p class="sm" style="text-align:center;margin:4px 0 0">칠할 곳을 누르세요 · 같은 색으로 한 번 더 누르면 지워져요</p>` : ""}</div>`;
+}
+function wireHl(redraw) {
+  const V = $("#view");
+  V.querySelector("#hlT")?.addEventListener("click", () => { hlMode = !hlMode; redraw(); });
+  V.querySelectorAll("[data-hc]").forEach(b => b.onclick = () => { hlColor = b.dataset.hc; redraw(); });
+}
+const keepY = f => { const y = scrollY, m = $("#view .mmap"), x = m ? m.scrollLeft : 0; f(); scrollTo(0, y); const m2 = $("#view .mmap"); if (m2) m2.scrollLeft = x; };
+function hlBase(k, c) {
+  const m = k.match(/^m(\d+):(.+)$/);
+  if (m) { if (typeof MM === "undefined" || !MM.length) return null; const s = MM.find(x => x.n === +m[1]); if (!s) return null; let n; try { n = mmAt(s, m[2]); } catch { return null; } if (!n) return null;
+    return { k, c, kind: "m", s, p: m[2], t: n.t, sub: s.k ? `🧠 ${s.k} 마인드맵` : `🧠 ${s.n}절 마인드맵`, say: [mmSpeak(n.t), ...(n.n || []).map(([kk, t]) => kk === "설명" ? t : `${kk}. ${t}`)].join(". "), ord: s.n * 1e6 + m[2].split(".").slice(1).reduce((a, v) => a * 40 + +v, 0) }; }
+  return hlBookItem(k, c);
+}
+function hlItems() {
+  const out = [];
+  for (const [k, c] of Object.entries(hlAll())) { const x = hlBase(k, c); if (x) out.push(x); }
+  for (const [k, rs] of Object.entries(S.hlr || {})) for (const r of rs) { const x = hlBase(k, r[2]); if (x) out.push({ ...x, t: r[3] || x.t, say: r[3] || x.say, part: 1, ord: x.ord + r[0] / 1e4 + 1e-6 }); }
+  return out.sort((a, b) => a.ord - b.ord);
+}
+/** 교재 하이라이트 한 개 → 목록 항목 (앱마다 교재 구조가 달라 따로 둠) */
+function hlBookItem(k, c) {
+  const m = k.match(/^b(\d+):(\d+)$/); if (!m || typeof BOOK === "undefined" || !BOOK) return null;
+  const s = BOOK.find(x => x.n === +m[1]), b = s && s.blocks[+m[2]]; if (!b || b.t === "table") return null;
+  return { k, c, kind: "b", s, i: +m[2], t: b.t === "box" ? `${b.k} · ${b.x}` : b.x, sub: `📖 ${s.n}절 교재`, say: b.t === "box" ? `${b.k}. ${b.x}` : b.x, ord: 5e8 + s.n * 1e4 + +m[2] };
+}
+function hlBookGo(x) { secOnly = false; go("section", { n: x.s.n, focus: x.i }); }
+function hlLoad() { return Promise.resolve(); }
+function openHl() { hlLoad().then(openHl2, openHl2); }
+function openHl2() {
+  let f = "all";
+  modal("🖍 내 하이라이트", `<div id="hb"></div>`, (m, close) => {
+    const draw = () => {
+      const all = hlItems(), it = all.filter(x => f === "all" || x.c === f);
+      m.querySelector("#hb").innerHTML = all.length ? `
+      <div class="chips"><button class="chip ${f === "all" ? "on" : ""}" data-f="all">전체 ${all.length}</button>${Object.entries(HLC).map(([k, [l, c]]) => { const n = all.filter(x => x.c === k).length; return n ? `<button class="chip ${f === k ? "on" : ""}" data-f="${k}" style="${f === k ? "" : `background:${c};color:var(--ink)`}">${l} ${n}</button>` : ""; }).join("")}</div>
+      <button class="btn b-purple mt" id="hSay">🔊 하이라이트 ${it.length}개 듣기</button>
+      <div class="mt">${it.map((x, i) => `<button class="hli" data-i="${i}" style="border-left-color:${HLC[x.c][1]}"><span class="sm">${x.sub}${x.part ? " · 고른 글자" : ""}</span><br>${esc(x.t.length > 120 ? x.t.slice(0, 120) + "…" : x.t)}</button>`).join("")}</div>
+      <p class="sm" style="text-align:center">누르면 그 자리로 가요</p>` : `<p class="sm" style="line-height:1.7">아직 칠한 곳이 없어요.<br>① 글자를 <b>길게 눌러 선택</b>하면 아래에 색 막대가 나와요.<br>② 또는 ${typeof MM !== "undefined" ? "🧠 마인드맵이나 " : ""}📖 교재에서 <b>🖍 하이라이트 칠하기</b>를 켜고 통째로 칠할 곳을 누르세요.</p>`;
+      m.querySelectorAll("[data-f]").forEach(b => b.onclick = () => { f = b.dataset.f; draw(); });
+      m.querySelector("#hSay")?.addEventListener("click", () => TTS.play(it.map(x => ({ text: x.say, label: `🖍 ${x.t.slice(0, 36)}`, pause: 600 }))));
+      m.querySelectorAll("[data-i]").forEach(b => b.onclick = () => { const x = it[+b.dataset.i]; close();
+        if (x.kind === "m") { mmSec = x.s.n; mmMode = "list"; mmOpen = new Set(); const ps = x.p.split("."); for (let k = 2; k <= ps.length; k++) mmOpen.add(ps.slice(0, k).join(".")); go("msec", { focus: x.p }); }
+        else hlBookGo(x); });
+    };
+    draw();
+  });
+}
+
+/* ---------- 🖍 글자 선택해서 칠하기 (부분 하이라이트) ---------- */
+const hlR = () => (S.hlr = S.hlr || {});
+const hlBox = el => el.querySelector(".hx") || el;
+function hlTextOff(box, node, off) { const r = document.createRange(); r.setStart(box, 0); try { r.setEnd(node, off); } catch { return -1; } return r.toString().length; }
+function hlUnwrap(el) { el.querySelectorAll("mark.hlm").forEach(m => m.replaceWith(...m.childNodes)); el.normalize(); delete el.dataset.hla; }
+function hlWrap(el) {
+  const rs = (hlR()[el.dataset.hk] || []).slice().sort((a, b) => a[0] - b[0]); el.dataset.hla = "1"; if (!rs.length) return;
+  const box = hlBox(el), tw = document.createTreeWalker(box, NodeFilter.SHOW_TEXT), nodes = []; let n, pos = 0;
+  while ((n = tw.nextNode())) { nodes.push([n, pos]); pos += n.nodeValue.length; }
+  for (const [node, start] of nodes) {
+    const t = node.nodeValue, end = start + t.length, cuts = rs.filter(r => r[0] < end && r[1] > start); if (!cuts.length) continue;
+    const f = document.createDocumentFragment(); let at = 0;
+    for (const r of cuts) { const a = Math.max(0, r[0] - start), b = Math.min(t.length, r[1] - start);
+      if (a > at) f.append(t.slice(at, a)); const mk = document.createElement("mark"); mk.className = `hlm hl-${r[2]}`; mk.textContent = t.slice(a, b); f.append(mk); at = b; }
+    if (at < t.length) f.append(t.slice(at)); node.replaceWith(f);
+  }
+}
+function hlApplyAll(root = document) { root.querySelectorAll("[data-hk]").forEach(el => { if (!el.dataset.hla) hlWrap(el); }); }
+function hlRefresh(el) { hlUnwrap(el); hlWrap(el); }
+let hlSel = null;
+function hlPop(show) {
+  let p = $("#hlpop");
+  if (!show) { p?.remove(); hlSel = null; return; }
+  if (!p) { p = document.createElement("div"); p.id = "hlpop"; document.body.appendChild(p); }
+  const cur = (hlR()[hlSel.k] || []).find(r => r[0] < hlSel.e && r[1] > hlSel.s);
+  p.innerHTML = `<div class="sm" style="color:#fff;margin:0 0 6px">🖍 고른 글자 칠하기${cur ? " · 색 바꾸기" : ""}</div><div class="hlc" style="grid-template-columns:repeat(5,1fr);margin:0">${Object.entries(HLC).map(([k, [l, c]]) => `<button data-sc="${k}" class="${cur && cur[2] === k ? "on" : ""}" style="background:${c}">${l}</button>`).join("")}<button data-sc="" style="background:#fff">${cur ? "지우기" : "닫기"}</button></div>`;
+  p.querySelectorAll("[data-sc]").forEach(b => { b.onpointerdown = e => e.preventDefault(); b.onclick = e => { e.stopPropagation(); hlApplySel(b.dataset.sc); }; });
+}
+function hlApplySel(c) {
+  if (!hlSel) return; const { k, s, e, el, txt } = hlSel, R = hlR(), old = R[k] || [], out = [];
+  for (const r of old) { if (r[1] <= s || r[0] >= e) { out.push(r); continue; }
+    if (r[0] < s) out.push([r[0], s, r[2], (r[3] || "").slice(0, s - r[0])]);
+    if (r[1] > e) out.push([e, r[1], r[2], (r[3] || "").slice(e - r[0])]); }
+  if (c) out.push([s, e, c, txt]);
+  if (out.length) R[k] = out.sort((a, b) => a[0] - b[0]); else delete R[k];
+  save(); try { getSelection().removeAllRanges(); } catch {} hlPop(false); if (el.isConnected) hlRefresh(el);
+  if (c) toast("칠했어요 🖍"); else toast("지웠어요");
+}
+let hlT0 = 0;
+document.addEventListener("selectionchange", () => { clearTimeout(hlT0); hlT0 = setTimeout(() => {
+  const sel = getSelection(); if (!sel || sel.isCollapsed || !sel.rangeCount) { if ($("#hlpop") && !hlSel?.keep) hlPop(false); return; }
+  const r = sel.getRangeAt(0), a = r.startContainer, b = r.endContainer;
+  const el = (a.nodeType === 1 ? a : a.parentElement)?.closest("[data-hk]"), el2 = (b.nodeType === 1 ? b : b.parentElement)?.closest("[data-hk]");
+  if (!el || el !== el2 || !$("#view").contains(el)) { hlPop(false); return; }
+  const box = hlBox(el); if (!box.contains(a) || !box.contains(b)) { hlPop(false); return; }
+  let s = hlTextOff(box, a, r.startOffset), e = hlTextOff(box, b, r.endOffset); if (s < 0 || e <= s) return;
+  const full = box.textContent; while (s < e && /\s/.test(full[s])) s++; while (e > s && /\s/.test(full[e - 1])) e--; if (e <= s) return;
+  hlSel = { k: el.dataset.hk, s, e, el, txt: full.slice(s, e) }; hlPop(true);
+}, 250); });
+new MutationObserver(() => setTimeout(() => hlApplyAll($("#view")), 0)).observe(document.getElementById("view"), { childList: true });
+/* 마인드맵 화면은 한 번 칠한 뒤 다시 그려질 때도 칠한 부분이 남게 */
+setTimeout(() => hlApplyAll($("#view")), 0);
+
 
 /* ---------- 🎧 듣기 공부 ---------- */
 function listenPoints() {
