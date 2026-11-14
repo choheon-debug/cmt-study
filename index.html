@@ -134,7 +134,9 @@ textarea.inp{min-height:5rem;resize:vertical;line-height:1.5}
 .hli{display:block;width:100%;text-align:left;background:#fff;border:1px solid var(--line);border-left:8px solid;border-radius:12px;padding:9px 11px;margin:6px 0;line-height:1.5;font-size:.95rem;color:var(--ink)}
 .book [data-hk]{-webkit-user-select:text;user-select:text}
 mark.hlm{color:inherit;border-radius:4px;padding:0 1px}
-#hlpop{position:fixed;left:10px;right:10px;bottom:calc(env(safe-area-inset-bottom,0px) + 150px);z-index:70;max-width:30rem;margin:0 auto;background:#1f2937;border-radius:16px;padding:10px;box-shadow:0 8px 24px rgb(0 0 0 / .35)}
+#hlpop{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom,0px) + 96px);z-index:70;display:flex;align-items:center;gap:8px;background:#1f2937;border-radius:999px;padding:6px 8px;box-shadow:0 4px 14px rgb(0 0 0 / .3)}
+#hlpop .hd{width:30px;height:30px;border-radius:50%;border:2px solid #fff;padding:0;font-weight:800;font-size:.85rem;color:#111827}#hlpop .hd.on{outline:2px solid #fff;outline-offset:2px}
+#hlpop .hx2{border:0;background:none;color:#fff;font-weight:800;font-size:.85rem;padding:4px 6px}
 </style>
 </head>
 <body>
@@ -650,7 +652,7 @@ function hlPop(show) {
   if (!show) { p?.remove(); hlSel = null; return; }
   if (!p) { p = document.createElement("div"); p.id = "hlpop"; document.body.appendChild(p); }
   const cur = (hlR()[hlSel.k] || []).find(r => r[0] < hlSel.e && r[1] > hlSel.s);
-  p.innerHTML = `<div class="sm" style="color:#fff;margin:0 0 6px">🖍 고른 글자 칠하기${cur ? " · 색 바꾸기" : ""}</div><div class="hlc" style="grid-template-columns:repeat(5,1fr);margin:0">${Object.entries(HLC).map(([k, [l, c]]) => `<button data-sc="${k}" class="${cur && cur[2] === k ? "on" : ""}" style="background:${c}">${l}</button>`).join("")}<button data-sc="" style="background:#fff">${cur ? "지우기" : "닫기"}</button></div>`;
+  p.innerHTML = `${Object.entries(HLC).map(([k, [l, c]]) => `<button data-sc="${k}" class="hd${cur && cur[2] === k ? " on" : ""}" style="background:${c}" aria-label="${l}">${cur && cur[2] === k ? "✓" : ""}</button>`).join("")}<button data-sc="" class="hx2" aria-label="${cur ? "지우기" : "닫기"}">${cur ? "지우기" : "✕"}</button>`;
   p.querySelectorAll("[data-sc]").forEach(b => { b.onpointerdown = e => e.preventDefault(); b.onclick = e => { e.stopPropagation(); hlApplySel(b.dataset.sc); }; });
 }
 function hlApplySel(c) {
