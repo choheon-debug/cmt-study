@@ -136,6 +136,9 @@ textarea.inp{min-height:5rem;resize:vertical;line-height:1.5}
 mark.hlm{color:inherit;border-radius:4px;padding:0 1px}
 #hlpop{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom,0px) + 96px);z-index:70;display:flex;align-items:center;gap:8px;background:#1f2937;border-radius:999px;padding:6px 8px;box-shadow:0 4px 14px rgb(0 0 0 / .3)}
 #hlpop .hd{width:30px;height:30px;border-radius:50%;border:2px solid #fff;padding:0;font-weight:800;font-size:.85rem;color:#111827}#hlpop .hd.on{outline:2px solid #fff;outline-offset:2px}
+mark.has-memo::after{content:"📝";font-size:.75em;margin-left:2px;vertical-align:super}
+.memo{background:#fef9c3;border:1px solid #fde047;border-radius:12px;padding:8px 11px;margin:0 0 8px;line-height:1.6;font-size:.95rem;white-space:pre-line;cursor:pointer}
+.hmemo{display:block;background:#fef9c3;border-radius:8px;padding:4px 8px;margin-top:5px;font-size:.88rem;white-space:pre-line}
 #hlpop .hx2{border:0;background:none;color:#fff;font-weight:800;font-size:.85rem;padding:4px 6px}
 </style>
 </head>
@@ -152,7 +155,7 @@ mark.hlm{color:inherit;border-radius:4px;padding:0 1px}
 const KEY = "cmt.v1";
 const SUBJ = { T: "이론·심리", C: "차트·추세·패턴", A: "지표·통계·사이클", R: "위험·시장·윤리" };
 const SUBJ_SUB = { T: "1~2주차: 기초·다우 이론·EMH·행동재무학", C: "3~5주차: 차트·캔들·P&F·추세·패턴", A: "6~8주차: 지표·거래량·통계·사이클·시스템", R: "9~10주차: 위험관리·금융상품·상대강도·윤리" };
-const def = () => ({ q: {}, star: [], cards: {}, day: { d: "", n: 0 }, set: { exam: "", goal: 20, rate: 1, voice: "" }, mocks: [], my: [], hl: {} });
+const def = () => ({ q: {}, star: [], cards: {}, day: { d: "", n: 0 }, set: { exam: "", goal: 20, rate: 1, voice: "" }, mocks: [], my: [], hl: {}, memo: {} });
 let S = def();
 try { const raw = localStorage.getItem(KEY); if (raw) S = Object.assign(def(), JSON.parse(raw)); S.set = Object.assign(def().set, S.set); } catch {}
 function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch { toast("저장 공간이 꽉 찼어요"); } }
@@ -524,7 +527,7 @@ function viewBook() {
   <section class="card">${BOOK.map(s => { const nq = QS.filter(q => q.c === s.n).length;
     return `<button class="sec" data-n="${s.n}"><span class="n">${s.n}</span><b>${esc(s.title)}<br><span class="sm">${nq ? `문제 ${nq}개 · ` : ""}요점 ${s.blocks.filter(b => KEYK.includes(b.k)).length}개</span></b><span class="sm">›</span></button>`; }).join("")}</section>
   <button class="btn b-purple" id="bAll">🎧 요점만 모아 듣기</button>
-  <button class="btn b-orange" id="bHl">🖍 내 하이라이트<small>칠한 곳 ${hlCount("")}개 모아 보기·듣기</small></button>`;
+  <button class="btn b-orange" id="bHl">🖍 하이라이트·📝 메모<small>칠한 곳 ${hlCount("")}개 모아 보기·듣기</small></button>`;
   wireHead();
   $("#view").querySelectorAll("[data-n]").forEach(b => b.onclick = () => go("section", { n: +b.dataset.n }));
   $("#bAll").onclick = () => listenPoints();
@@ -596,7 +599,9 @@ function hlBase(k, c) {
 function hlItems() {
   const out = [];
   for (const [k, c] of Object.entries(hlAll())) { const x = hlBase(k, c); if (x) out.push(x); }
-  for (const [k, rs] of Object.entries(S.hlr || {})) for (const r of rs) { const x = hlBase(k, r[2]); if (x) out.push({ ...x, t: r[3] || x.t, say: r[3] || x.say, part: 1, ord: x.ord + r[0] / 1e4 + 1e-6 }); }
+  for (const [k, rs] of Object.entries(S.hlr || {})) for (const r of rs) { const x = hlBase(k, r[2]); if (x) out.push({ ...x, t: r[3] || x.t, say: (r[3] || x.say) + (r[4] ? `. 메모: ${r[4]}` : ""), memo: r[4], part: 1, ord: x.ord + r[0] / 1e4 + 1e-6 }); }
+  for (const [k, v] of Object.entries(S.memo || {})) { const x = hlBase(k, "y"); if (x) out.push({ ...x, c: "memo", memo: v, say: `${x.t}. 메모: ${v}`, ord: x.ord + 0.2 }); }
+  for (const x of out) if (x.part && x.memoR) x.memo = x.memoR;
   return out.sort((a, b) => a.ord - b.ord);
 }
 /** 교재 하이라이트 한 개 → 목록 항목 (앱마다 교재 구조가 달라 따로 둠) */
@@ -610,14 +615,14 @@ function hlLoad() { return Promise.resolve(); }
 function openHl() { hlLoad().then(openHl2, openHl2); }
 function openHl2() {
   let f = "all";
-  modal("🖍 내 하이라이트", `<div id="hb"></div>`, (m, close) => {
+  modal("🖍 하이라이트·📝 메모", `<div id="hb"></div>`, (m, close) => {
     const draw = () => {
-      const all = hlItems(), it = all.filter(x => f === "all" || x.c === f);
+      const all = hlItems(), it = all.filter(x => f === "all" || (f === "memo" ? x.memo : x.c === f)), nm = all.filter(x => x.memo).length;
       m.querySelector("#hb").innerHTML = all.length ? `
-      <div class="chips"><button class="chip ${f === "all" ? "on" : ""}" data-f="all">전체 ${all.length}</button>${Object.entries(HLC).map(([k, [l, c]]) => { const n = all.filter(x => x.c === k).length; return n ? `<button class="chip ${f === k ? "on" : ""}" data-f="${k}" style="${f === k ? "" : `background:${c};color:var(--ink)`}">${l} ${n}</button>` : ""; }).join("")}</div>
-      <button class="btn b-purple mt" id="hSay">🔊 하이라이트 ${it.length}개 듣기</button>
-      <div class="mt">${it.map((x, i) => `<button class="hli" data-i="${i}" style="border-left-color:${HLC[x.c][1]}"><span class="sm">${x.sub}${x.part ? " · 고른 글자" : ""}</span><br>${esc(x.t.length > 120 ? x.t.slice(0, 120) + "…" : x.t)}</button>`).join("")}</div>
-      <p class="sm" style="text-align:center">누르면 그 자리로 가요</p>` : `<p class="sm" style="line-height:1.7">아직 칠한 곳이 없어요.<br>마인드맵이나 교재에서 글자를 <b>길게 눌러 선택</b>하면 아래에 색 막대가 나와요.</p>`;
+      <div class="chips"><button class="chip ${f === "all" ? "on" : ""}" data-f="all">전체 ${all.length}</button>${Object.entries(HLC).map(([k, [l, c]]) => { const n = all.filter(x => x.c === k).length; return n ? `<button class="chip ${f === k ? "on" : ""}" data-f="${k}" style="${f === k ? "" : `background:${c};color:var(--ink)`}">${l} ${n}</button>` : ""; }).join("")}${nm ? `<button class="chip ${f === "memo" ? "on" : ""}" data-f="memo">📝 메모 ${nm}</button>` : ""}</div>
+      <button class="btn b-purple mt" id="hSay">🔊 ${it.length}개 듣기</button>
+      <div class="mt">${it.map((x, i) => `<button class="hli" data-i="${i}" style="border-left-color:${(HLC[x.c] || ["", "#fde047"])[1]}"><span class="sm">${x.sub}${x.part ? " · 고른 글자" : x.c === "memo" ? " · 요점 메모" : ""}</span><br>${esc(x.t.length > 120 ? x.t.slice(0, 120) + "…" : x.t)}${x.memo ? `<span class="hmemo">📝 ${esc(x.memo)}</span>` : ""}</button>`).join("")}</div>
+      <p class="sm" style="text-align:center">누르면 그 자리로 가요</p>` : `<p class="sm" style="line-height:1.7">아직 칠하거나 메모한 곳이 없어요.<br>마인드맵이나 교재에서 글자를 <b>길게 눌러 선택</b>하면 아래에 색 막대가 나와요. 📝를 누르면 메모를 붙일 수 있어요.</p>`;
       m.querySelectorAll("[data-f]").forEach(b => b.onclick = () => { f = b.dataset.f; draw(); });
       m.querySelector("#hSay")?.addEventListener("click", () => TTS.play(it.map(x => ({ text: x.say, label: `🖍 ${x.t.slice(0, 36)}`, pause: 600 }))));
       m.querySelectorAll("[data-i]").forEach(b => b.onclick = () => { const x = it[+b.dataset.i]; close();
@@ -641,7 +646,7 @@ function hlWrap(el) {
     const t = node.nodeValue, end = start + t.length, cuts = rs.filter(r => r[0] < end && r[1] > start); if (!cuts.length) continue;
     const f = document.createDocumentFragment(); let at = 0;
     for (const r of cuts) { const a = Math.max(0, r[0] - start), b = Math.min(t.length, r[1] - start);
-      if (a > at) f.append(t.slice(at, a)); const mk = document.createElement("mark"); mk.className = `hlm hl-${r[2]}`; mk.textContent = t.slice(a, b); f.append(mk); at = b; }
+      if (a > at) f.append(t.slice(at, a)); const mk = document.createElement("mark"); mk.className = `hlm hl-${r[2]}${r[4] && r[1] - start <= t.length ? " has-memo" : ""}`; if (r[4]) mk.dataset.mm = `${el.dataset.hk}#${r[0]}`; mk.textContent = t.slice(a, b); f.append(mk); at = b; }
     if (at < t.length) f.append(t.slice(at)); node.replaceWith(f);
   }
 }
@@ -653,19 +658,42 @@ function hlPop(show) {
   if (!show) { p?.remove(); hlSel = null; return; }
   if (!p) { p = document.createElement("div"); p.id = "hlpop"; document.body.appendChild(p); }
   const cur = (hlR()[hlSel.k] || []).find(r => r[0] < hlSel.e && r[1] > hlSel.s);
-  p.innerHTML = `${Object.entries(HLC).map(([k, [l, c]]) => `<button data-sc="${k}" class="hd${cur && cur[2] === k ? " on" : ""}" style="background:${c}" aria-label="${l}">${cur && cur[2] === k ? "✓" : ""}</button>`).join("")}<button data-sc="" class="hx2" aria-label="${cur ? "지우기" : "닫기"}">${cur ? "지우기" : "✕"}</button>`;
-  p.querySelectorAll("[data-sc]").forEach(b => { b.onpointerdown = e => e.preventDefault(); b.onclick = e => { e.stopPropagation(); hlApplySel(b.dataset.sc); }; });
+  p.innerHTML = `${Object.entries(HLC).map(([k, [l, c]]) => `<button data-sc="${k}" class="hd${cur && cur[2] === k ? " on" : ""}" style="background:${c}" aria-label="${l}">${cur && cur[2] === k ? "✓" : ""}</button>`).join("")}<button data-sc="memo" class="hx2" aria-label="메모">📝</button><button data-sc="" class="hx2" aria-label="${cur ? "지우기" : "닫기"}">${cur ? "지우기" : "✕"}</button>`;
+  p.querySelectorAll("[data-sc]").forEach(b => { b.onpointerdown = e => e.preventDefault(); b.onclick = e => { e.stopPropagation(); b.dataset.sc === "memo" ? hlMemoSel() : hlApplySel(b.dataset.sc); }; });
 }
-function hlApplySel(c) {
-  if (!hlSel) return; const { k, s, e, el, txt } = hlSel, R = hlR(), old = R[k] || [], out = [];
+function hlApplySel(c, memo, H) {
+  H = H || hlSel; if (!H) return; const { k, s, e, el, txt } = H, R = hlR(), old = R[k] || [], out = [];
+  const ov = old.find(r => r[0] < e && r[1] > s), keepMemo = memo !== undefined ? memo : ov && ov[4];
   for (const r of old) { if (r[1] <= s || r[0] >= e) { out.push(r); continue; }
     if (r[0] < s) out.push([r[0], s, r[2], (r[3] || "").slice(0, s - r[0])]);
     if (r[1] > e) out.push([e, r[1], r[2], (r[3] || "").slice(e - r[0])]); }
-  if (c) out.push([s, e, c, txt]);
+  if (c) out.push(keepMemo ? [s, e, c, txt, keepMemo] : [s, e, c, txt]);
   if (out.length) R[k] = out.sort((a, b) => a[0] - b[0]); else delete R[k];
   save(); try { getSelection().removeAllRanges(); } catch {} hlPop(false); document.querySelectorAll("[data-hk]").forEach(x => { if (x.dataset.hk === k) hlRefresh(x); });
-  if (c) toast("칠했어요 🖍"); else toast("지웠어요");
+  toast(memo !== undefined ? (memo ? "메모를 붙였어요 📝" : "메모를 지웠어요") : c ? "칠했어요 🖍" : "지웠어요");
 }
+/** 메모 쓰는 창 */
+function hlMemoModal(quote, val, onSave) {
+  modal("📝 메모", `${quote ? `<p class="sm" style="margin:0 0 8px;line-height:1.5">"${esc(quote.length > 80 ? quote.slice(0, 80) + "…" : quote)}"</p>` : ""}
+    <textarea class="inp" id="mmT" style="min-height:7rem" placeholder="여기에 메모를 쓰세요">${esc(val || "")}</textarea>
+    <div class="g2 mt"><button class="btn b-gray" id="mmDel">${val ? "🗑️ 메모 지우기" : "취소"}</button><button class="btn b-teal" id="mmOk">💾 저장</button></div>`, (m, close) => {
+    const t = m.querySelector("#mmT"); setTimeout(() => t.focus(), 50);
+    m.querySelector("#mmOk").onclick = () => { close(); onSave(t.value.trim()); };
+    m.querySelector("#mmDel").onclick = () => { close(); if (val) onSave(""); };
+  });
+}
+function hlMemoSel() {
+  const H = hlSel; if (!H) return; const cur = (hlR()[H.k] || []).find(r => r[0] < H.e && r[1] > H.s);
+  hlSel = { ...H, keep: true };
+  hlMemoModal(H.txt, cur && cur[4], v => { hlApplySel(cur ? cur[2] : "y", v, H); });
+  try { getSelection().removeAllRanges(); } catch {} hlPop(false);
+}
+function hlShowMemo(id) {
+  const [k, st] = id.split("#"), R = hlR(), r = (R[k] || []).find(x => x[0] === +st); if (!r) return;
+  const el = [...document.querySelectorAll("[data-hk]")].find(x => x.dataset.hk === k);
+  hlMemoModal(r[3], r[4], v => { if (v) r[4] = v; else r.splice(4); save(); document.querySelectorAll("[data-hk]").forEach(x => { if (x.dataset.hk === k) hlRefresh(x); }); toast(v ? "메모를 고쳤어요 📝" : "메모를 지웠어요"); });
+}
+document.addEventListener("click", e => { const m = e.target.closest && e.target.closest("mark.has-memo"); if (!m) return; e.preventDefault(); e.stopPropagation(); hlShowMemo(m.dataset.mm); }, true);
 let hlT0 = 0;
 document.addEventListener("selectionchange", () => { clearTimeout(hlT0); hlT0 = setTimeout(() => {
   const sel = getSelection(); if (!sel || sel.isCollapsed || !sel.rangeCount) { if ($("#hlpop") && !hlSel?.keep) hlPop(false); return; }
