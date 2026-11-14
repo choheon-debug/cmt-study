@@ -671,8 +671,13 @@ document.addEventListener("selectionchange", () => { clearTimeout(hlT0); hlT0 = 
   const r = sel.getRangeAt(0), a = r.startContainer, b = r.endContainer;
   const el = (a.nodeType === 1 ? a : a.parentElement)?.closest("[data-hk]"), el2 = (b.nodeType === 1 ? b : b.parentElement)?.closest("[data-hk]");
   if (!el || el !== el2 || !$("#view").contains(el)) { hlPop(false); return; }
-  const box = hlBox(el); if (!box.contains(a) || !box.contains(b)) { hlPop(false); return; }
-  let s = hlTextOff(box, a, r.startOffset), e = hlTextOff(box, b, r.endOffset); if (s < 0 || e <= s) return;
+  const box = hlBox(el), full0 = box.textContent.length;
+  /* 선택이 "설명" 같은 이름표에서 시작하거나 글 밖으로 넘어가도 글 부분만 칠해요 */
+  const br = document.createRange(); br.selectNodeContents(box);
+  let s = r.compareBoundaryPoints(Range.START_TO_START, br) <= 0 ? 0 : hlTextOff(box, a, r.startOffset);
+  let e = r.compareBoundaryPoints(Range.END_TO_END, br) >= 0 ? full0 : hlTextOff(box, b, r.endOffset);
+  if (r.compareBoundaryPoints(Range.START_TO_END, br) < 0 || r.compareBoundaryPoints(Range.END_TO_START, br) > 0) { hlPop(false); return; }
+  if (s < 0 || e <= s) return;
   const full = box.textContent; while (s < e && /\s/.test(full[s])) s++; while (e > s && /\s/.test(full[e - 1])) e--; if (e <= s) return;
   hlSel = { k: el.dataset.hk, s, e, el, txt: full.slice(s, e) }; hlPop(true);
 }, 250); });
