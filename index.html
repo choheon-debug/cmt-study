@@ -699,7 +699,7 @@ document.addEventListener("selectionchange", () => { clearTimeout(hlT0); hlT0 = 
   const sel = getSelection(); if (!sel || sel.isCollapsed || !sel.rangeCount) { if ($("#hlpop") && !hlSel?.keep) hlPop(false); return; }
   const r = sel.getRangeAt(0), a = r.startContainer, b = r.endContainer;
   const el = (a.nodeType === 1 ? a : a.parentElement)?.closest("[data-hk]"), el2 = (b.nodeType === 1 ? b : b.parentElement)?.closest("[data-hk]");
-  if (!el || el !== el2 || !$("#view").contains(el)) { hlPop(false); return; }
+  if (!el || el !== el2) { hlPop(false); return; }
   const box = hlBox(el), full0 = box.textContent.length;
   /* 선택이 "설명" 같은 이름표에서 시작하거나 글 밖으로 넘어가도 글 부분만 칠해요 */
   const br = document.createRange(); br.selectNodeContents(box);
