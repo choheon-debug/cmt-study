@@ -576,6 +576,7 @@ const hlCls = k => { const c = hlAll()[k]; return c ? ` hl-${c}` : ""; };
 function hlSet(k, c) { const h = hlAll(); if (!c || h[k] === c) delete h[k]; else h[k] = c; save(); }
 const hlCount = pre => Object.keys(hlAll()).filter(k => k.startsWith(pre)).length;
 function hlBar() {
+  return ""; /* 칠하기 버튼 없이, 글자를 선택하면 색 막대가 나와요 */
   return `<div class="hlbar"><button class="btn ${hlMode ? "b-orange" : "b-gray"}" id="hlT">🖍 ${hlMode ? "칠하기 켜짐 · 다 칠했으면 누르세요" : "하이라이트 칠하기"}</button>
   ${hlMode ? `<div class="hlc">${Object.entries(HLC).map(([k, [l, c]]) => `<button data-hc="${k}" class="${hlColor === k ? "on" : ""}" style="background:${c}">${l}</button>`).join("")}</div>
   <p class="sm" style="text-align:center;margin:4px 0 0">칠할 곳을 누르세요 · 같은 색으로 한 번 더 누르면 지워져요</p>` : ""}</div>`;
@@ -616,7 +617,7 @@ function openHl2() {
       <div class="chips"><button class="chip ${f === "all" ? "on" : ""}" data-f="all">전체 ${all.length}</button>${Object.entries(HLC).map(([k, [l, c]]) => { const n = all.filter(x => x.c === k).length; return n ? `<button class="chip ${f === k ? "on" : ""}" data-f="${k}" style="${f === k ? "" : `background:${c};color:var(--ink)`}">${l} ${n}</button>` : ""; }).join("")}</div>
       <button class="btn b-purple mt" id="hSay">🔊 하이라이트 ${it.length}개 듣기</button>
       <div class="mt">${it.map((x, i) => `<button class="hli" data-i="${i}" style="border-left-color:${HLC[x.c][1]}"><span class="sm">${x.sub}${x.part ? " · 고른 글자" : ""}</span><br>${esc(x.t.length > 120 ? x.t.slice(0, 120) + "…" : x.t)}</button>`).join("")}</div>
-      <p class="sm" style="text-align:center">누르면 그 자리로 가요</p>` : `<p class="sm" style="line-height:1.7">아직 칠한 곳이 없어요.<br>① 글자를 <b>길게 눌러 선택</b>하면 아래에 색 막대가 나와요.<br>② 또는 ${typeof MM !== "undefined" ? "🧠 마인드맵이나 " : ""}📖 교재에서 <b>🖍 하이라이트 칠하기</b>를 켜고 통째로 칠할 곳을 누르세요.</p>`;
+      <p class="sm" style="text-align:center">누르면 그 자리로 가요</p>` : `<p class="sm" style="line-height:1.7">아직 칠한 곳이 없어요.<br>마인드맵이나 교재에서 글자를 <b>길게 눌러 선택</b>하면 아래에 색 막대가 나와요.</p>`;
       m.querySelectorAll("[data-f]").forEach(b => b.onclick = () => { f = b.dataset.f; draw(); });
       m.querySelector("#hSay")?.addEventListener("click", () => TTS.play(it.map(x => ({ text: x.say, label: `🖍 ${x.t.slice(0, 36)}`, pause: 600 }))));
       m.querySelectorAll("[data-i]").forEach(b => b.onclick = () => { const x = it[+b.dataset.i]; close();
