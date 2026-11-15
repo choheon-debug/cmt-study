@@ -192,6 +192,7 @@ mark.has-memo::after{content:"📝";font-size:.75em;margin-left:2px;vertical-ali
 .memo{background:#fef9c3;border:1px solid #fde047;border-radius:12px;padding:8px 11px;margin:0 0 8px;line-height:1.6;font-size:.95rem;white-space:pre-line;cursor:pointer}
 .hmemo{display:block;background:#fef9c3;border-radius:8px;padding:4px 8px;margin-top:5px;font-size:.88rem;white-space:pre-line}
 #hlpop .hx2{border:0;background:none;color:#fff;font-weight:800;font-size:.85rem;padding:4px 6px}
+._tk{text-shadow:0 0 0 transparent}
 ::highlight(tts){background-color:#dbeafe;color:inherit}
 </style>
 </head>
@@ -322,7 +323,10 @@ function say(t) {
 /* 읽는 문장을 옅은 하늘색으로 따라가며 보여 줘요 (글자는 바꾸지 않고 덧칠만) */
 const TTS_HL = (() => { try { return !!(window.CSS && CSS.highlights && window.Highlight); } catch { return false; } })();
 function ttsSent(t) { const a = String(t).match(/[^.!?。]+[.!?。]*["'”’)]*\s*|[.!?。]+\s*/g) || [String(t)]; const out = []; for (const x of a) { if (out.length && out[out.length - 1].trim().length < 6) out[out.length - 1] += x; else out.push(x); } return out; }
-function ttsClear() { try { if (TTS_HL) CSS.highlights.delete("tts"); } catch {} }
+/* 아이폰은 칠한 곳을 바꿔도 화면을 바로 다시 안 그릴 때가 있어서, 살짝 건드려 다시 그리게 해요 */
+let ttsEl = null;
+function ttsPaint(el) { if (ttsEl && ttsEl !== el && ttsEl.isConnected) ttsEl.classList.toggle("_tk"); ttsEl = el; if (el) el.classList.toggle("_tk"); }
+function ttsClear() { try { if (TTS_HL) CSS.highlights.delete("tts"); } catch {}  ttsPaint(null); }
 function ttsMark(el, seg, from) {
   if (!TTS_HL || !el || !el.isConnected) return from;
   const tw = document.createTreeWalker(el, NodeFilter.SHOW_TEXT), nodes = []; let n, full = "";
@@ -331,6 +335,7 @@ function ttsMark(el, seg, from) {
   let i = full.indexOf(key, from); if (i < 0) i = full.indexOf(key); if (i < 0) { ttsClear(); return from; }
   const e = i + key.length, at = pos => { for (let j = nodes.length - 1; j >= 0; j--) if (nodes[j][1] <= pos) return [nodes[j][0], Math.min(pos - nodes[j][1], nodes[j][0].nodeValue.length)]; return [nodes[0][0], 0]; };
   try { const r = document.createRange(), [a, ao] = at(i), [b, bo] = at(e); r.setStart(a, ao); r.setEnd(b, bo); CSS.highlights.set("tts", new Highlight(r)); } catch {}
+  ttsPaint(el);
   return e;
 }
 function chunks(t) {
