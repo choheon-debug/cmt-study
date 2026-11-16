@@ -192,6 +192,17 @@ mark.has-memo::after{content:"📝";font-size:.75em;margin-left:2px;vertical-ali
 .memo{background:#fef9c3;border:1px solid #fde047;border-radius:12px;padding:8px 11px;margin:0 0 8px;line-height:1.6;font-size:.95rem;white-space:pre-line;cursor:pointer}
 .hmemo{display:block;background:#fef9c3;border-radius:8px;padding:4px 8px;margin-top:5px;font-size:.88rem;white-space:pre-line}
 #hlpop .hx2{border:0;background:none;color:#fff;font-weight:800;font-size:.85rem;padding:4px 6px}
+/* 마인드맵 표 */
+.mtb{overflow:auto;-webkit-overflow-scrolling:touch;border:1px solid #cbd5e1;border-radius:12px;margin:10px 0;background:#fff;cursor:zoom-in}
+.mtb table,.tbz table{border-collapse:collapse;width:100%}
+.mtb th,.mtb td,.tbz th,.tbz td{border:1px solid #e2e8f0;padding:6px 8px;text-align:left;vertical-align:top;line-height:1.5}
+.mtb th,.tbz th{background:#eef2f7;color:#1e3a8a;font-weight:800}
+.mtb table{font-size:.86rem}
+.mtb .tz{display:block;font-size:.75rem;color:#64748b;text-align:right;padding:3px 8px}
+.tbz{position:fixed;inset:0;z-index:9999;background:rgba(15,23,42,.82);display:flex;flex-direction:column;justify-content:center;padding:16px}
+.tbz .tb{background:#fff;border-radius:12px;max-height:80dvh;overflow:auto;-webkit-overflow-scrolling:touch;padding:10px}
+.tbz table{font-size:1rem}.tbz table+table{margin-top:12px}
+.tbz .tc{align-self:flex-end;background:#fff;border:0;border-radius:999px;font-size:1.1rem;font-weight:800;padding:6px 14px;margin-bottom:10px}
 ._tk{text-shadow:0 0 0 transparent}
 ::highlight(tts){background-color:#dbeafe;color:inherit}
 </style>
@@ -683,6 +694,15 @@ function viewMind() {
   hits();
 }
 const MNK = { "설명": ["설명", "#f0fdfa", "#99f6e4", "#0f766e"], "시험 포인트": ["🎯 시험 포인트", "#fef2f2", "#fecaca", "#ef4444"], "쉬운 예": ["💡 쉬운 예", "#eff6ff", "#bfdbfe", "#3b82f6"], "실전 사례": ["📰 실전 사례", "#fff7ed", "#fed7aa", "#f97316"], "문제 연습": ["✏️ 문제 연습", "#f0fdf4", "#bbf7d0", "#16a34a"], "표": ["📊 표", "#faf5ff", "#e9d5ff", "#9333ea"], "이번 주 학습목표": ["🎯 이번 주 학습목표", "#ecfeff", "#a5f3fc", "#0891b2"], "주차 핵심 요약": ["📌 주차 핵심 요약", "#f5f3ff", "#ddd6fe", "#6d28d9"] };
+/* 교재의 표를 마인드맵 요점에 붙여 보여 줘요. 누르면 크게 */
+const tblHtml = rows => `<table>${rows.map((r, i) => `<tr>${r.map(c => i ? `<td>${esc(c)}</td>` : `<th>${esc(c)}</th>`).join("")}</tr>`).join("")}</table>`;
+const mmTbl = rows => `<div class="mtb" data-tbz>${tblHtml(rows)}<span class="tz">🔍 누르면 크게 보여요</span></div>`;
+function tblZoom(list) {
+  const d = document.createElement("div"); d.className = "tbz";
+  d.innerHTML = `<button class="tc" type="button">✕ 닫기</button><div class="tb">${list.map(tblHtml).join("")}</div>`;
+  d.onclick = e => { if (e.target === d || e.target.closest(".tc")) d.remove(); };
+  document.body.appendChild(d);
+}
 function mmNote(s, p, onDone) {
   let dirty = false;
   const leaves = []; mmWalk(s, "r", (c, q) => { if (!(c.c && c.c.length)) leaves.push(q); });
@@ -695,10 +715,11 @@ function mmNote(s, p, onDone) {
       <div data-hk="m${s.n}:${q}" style="font-size:1.12rem;font-weight:800;line-height:1.45;margin-bottom:8px"><span class="hx ${hlCls(`m${s.n}:${q}`).trim()}" style="border-radius:6px;padding:0 3px">${esc(n.t)}</span></div>
       ${(S.memo || {})[`m${s.n}:${q}`] ? `<div class="memo" data-memo>📝 ${esc(S.memo[`m${s.n}:${q}`])}<span class="sm"> · 눌러서 고치기</span></div>` : `<button class="btn b-gray" data-memo style="padding:8px;margin:0 0 8px;font-size:.9rem">📝 이 요점에 메모 쓰기</button>`}
       ${(n.n || []).map(([kk, t], j) => { const [l, bg, bd, c] = MNK[kk] || MNK["설명"]; return `<div data-hk="mn${s.n}:${q}:${j}" style="background:${bg};border:1px solid ${bd};border-radius:14px;padding:10px 12px;margin:8px 0;line-height:1.7;font-size:1rem;white-space:pre-line;overflow-x:auto"><span style="display:inline-block;background:${c};color:#fff;font-size:.74rem;font-weight:800;border-radius:6px;padding:1px 7px;margin-right:6px">${l}</span><span class="hx">${esc(t)}</span></div>`; }).join("") || `<p class="sm">이 요점에는 따로 붙은 설명이 없어요.</p>`}
-      
+      ${(n.tb || []).map(mmTbl).join("")}
       <button class="btn b-purple mt" id="nSay">🔊 읽어 주기</button>
       <div class="g2 mt">${k > 0 ? `<button class="btn b-gray" id="nPrev">‹ 앞 요점</button>` : "<span></span>"}${k < leaves.length - 1 ? `<button class="btn b-gray" id="nNext">다음 요점 ›</button>` : "<span></span>"}</div>`;
       m.querySelector("#nSay").onclick = () => TTS.play([{ text: mmSpeak(n.t), label: n.t.slice(0, 40), el: m.querySelector(`[data-hk="m${s.n}:${q}"]`) }, ...(n.n || []).map(([kk, t], j) => ({ text: kk === "설명" ? t : `${kk}. ${t}`, label: `💬 ${kk}`, pause: 500, el: m.querySelector(`[data-hk="mn${s.n}:${q}:${j}"]`) }))]);
+      m.querySelectorAll("[data-tbz]").forEach((b, j) => b.onclick = () => tblZoom([n.tb[j]]));
       hlApplyAll(m);
       m.querySelector("[data-memo]").onclick = () => { const key = `m${s.n}:${q}`; hlMemoModal(n.t, (S.memo || {})[key], v => { S.memo = S.memo || {}; if (v) S.memo[key] = v; else delete S.memo[key]; save(); draw(); onDone?.(); toast(v ? "메모를 붙였어요 📝" : "메모를 지웠어요"); }); };
       hlApplyAll(m);
@@ -714,7 +735,7 @@ function viewMSec(arg = {}) {
   const s = MM.find(x => x.n === mmSec) || MM[0]; mmSec = s.n;
   const idx = MM.indexOf(s), nq = QS.filter(q => q.c === s.b).length, hasBook = BOOK.some(b => b.n === s.b);
   const list = (n, p, lv) => (n.c || []).map((c, i) => { const q = `${p}.${i}`, has = !!(c.c && c.c.length), o = mmOpen.has(q);
-    return `<div class="mi"><button class="mnd ${has ? "l" + Math.min(lv, 3) : "lf"}${hlCls(`m${s.n}:${q}`)}" data-p="${q}" data-hk="m${s.n}:${q}"><i>${has ? (o ? "▼" : "▶") : "•"}</i><span class="hx" style="flex:1">${esc(c.t)}</span>${(S.memo || {})[`m${s.n}:${q}`] ? `<em class="mn">📝</em>` : ""}${c.n ? `<em class="mn">${c.n.length > 1 ? c.n.length : ""}💬</em>` : ""}</button>${has && o ? `<div class="mk">${list(c, q, lv + 1)}</div>` : ""}</div>`; }).join("");
+    return `<div class="mi"><button class="mnd ${has ? "l" + Math.min(lv, 3) : "lf"}${hlCls(`m${s.n}:${q}`)}" data-p="${q}" data-hk="m${s.n}:${q}"><i>${has ? (o ? "▼" : "▶") : "•"}</i><span class="hx" style="flex:1">${esc(c.t)}</span>${(S.memo || {})[`m${s.n}:${q}`] ? `<em class="mn">📝</em>` : ""}${c.tb ? `<em class="mn" data-tbn>📊</em>` : ""}${c.n ? `<em class="mn">${c.n.length > 1 ? c.n.length : ""}💬</em>` : ""}</button>${has && o ? `<div class="mk">${list(c, q, lv + 1)}</div>` : ""}</div>`; }).join("");
   const map = (n, p, lv, col) => { const has = !!(n.c && n.c.length), o = mmOpen.has(p) || p === "r";
     const box = p === "r" ? `<span class="mx v0" style="--c:${SCOL[idx % SCOL.length]}">제${s.n}주차<br>${esc(s.t.split(" — ")[0])}</span>`
       : `<button class="mx ${lv === 0 ? "v0" : !has ? "vl" : lv === 1 ? "v1" : "v2"}${hlCls(`m${s.n}:${p}`)}" data-p="${p}" data-hk="m${s.n}:${p}"><span class="hx">${esc(n.t)}</span>${has && !o ? " ▸" : ""}</button>`;
@@ -743,7 +764,8 @@ function viewMSec(arg = {}) {
       return [{ text: mmSpeak(c.t), label: c.t.slice(0, 40), pause: c.c ? 450 : 300, el },
         ...(c.n || []).map(([kk, t]) => ({ text: kk === "설명" ? t : `${kk}. ${t}`, label: `💬 ${c.t.slice(0, 30)}`, el, pause: 500 }))]; }); };
   wireHl(() => keepY(() => viewMSec()));
-  V.querySelectorAll("[data-p]").forEach(b => b.onclick = () => { const p = b.dataset.p, n = mmAt(s, p);
+  V.querySelectorAll("[data-p]").forEach(b => b.onclick = e => { const p = b.dataset.p, n = mmAt(s, p);
+    if (e.target.closest("[data-tbn]") && n.tb) { tblZoom(n.tb); return; }
     if (hlMode) { hlSet(`m${s.n}:${p}`, hlColor); keepY(() => viewMSec()); return; }
     if (n.c && n.c.length) { mmOpen.has(p) ? mmOpen.delete(p) : mmOpen.add(p); const y = scrollY; viewMSec(); scrollTo(0, y); }
     else mmNote(s, p, () => keepY(() => viewMSec())); });
