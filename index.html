@@ -783,7 +783,7 @@ function viewMSec(arg = {}) {
     if (e.target.closest("[data-cho]")) { const k = `${s.n}:${p}`, v = mmCho.get(k) || 0; v >= 2 ? mmCho.delete(k) : mmCho.set(k, v + 1); keepY(() => viewMSec()); return; }
     if (mmHide && mmMode === "list" && !mmShown.has(`${s.n}:${p}`)) { mmShown.add(`${s.n}:${p}`); keepY(() => viewMSec()); return; }
     if (hlMode) { hlSet(`m${s.n}:${p}`, hlColor); keepY(() => viewMSec()); return; }
-    if (n.c && n.c.length) { mmOpen.has(p) ? mmOpen.delete(p) : mmOpen.add(p); const y = scrollY; viewMSec(); scrollTo(0, y); }
+    if (n.c && n.c.length) { mmOpen.has(p) ? mmOpen.delete(p) : mmOpen.add(p); const y = scrollY, sx = scrollX; viewMSec(); scrollTo(sx, y); }
     else mmNote(s, p, () => keepY(() => viewMSec())); });
   $("#mOpen")?.addEventListener("click", () => { mmOpen = new Set(all()); viewMSec(); });
   $("#mClose")?.addEventListener("click", () => { mmOpen = new Set(); viewMSec(); });
@@ -834,7 +834,7 @@ function wireHl(redraw) {
   V.querySelector("#hlT")?.addEventListener("click", () => { hlMode = !hlMode; redraw(); });
   V.querySelectorAll("[data-hc]").forEach(b => b.onclick = () => { hlColor = b.dataset.hc; redraw(); });
 }
-const keepY = f => { const y = scrollY, m = $("#view .mmap"), x = m ? m.scrollLeft : 0; f(); scrollTo(0, y); const m2 = $("#view .mmap"); if (m2) m2.scrollLeft = x; };
+const keepY = f => { const y = scrollY, sx = scrollX, m = $("#view .mmap"), x = m ? m.scrollLeft : 0; f(); scrollTo(sx, y); const m2 = $("#view .mmap"); if (m2) m2.scrollLeft = x; };
 function hlBase(k, c) {
   const mn = k.match(/^mn(\d+):(.+):(\d+)$/);
   if (mn) { const x = hlBase(`m${mn[1]}:${mn[2]}`, c); return x && { ...x, sub: x.sub + " 설명", ord: x.ord + 0.5 }; }
