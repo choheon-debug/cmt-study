@@ -797,7 +797,7 @@ function viewMSec(arg = {}) {
       const t = m.querySelector("#phT"); setTimeout(() => t.focus(), 50);
       m.querySelector("#phX").onclick = close;
       m.querySelector("#phOk").onclick = () => { S.mnem = S.mnem || {}; S.mnem[key] = t.value.trim();
-        const lv = m.querySelector("#phL").value.trim(); S.cho = S.cho || {}; if (lv && lv !== mmFirst(n)) S.cho[key] = lv; else delete S.cho[key]; save(); close(); keepY(() => viewMSec()); toast("외우기 쉬운 말을 저장했어요 💡"); };
+        const lv = m.querySelector("#phL").value.trim(); S.cho = S.cho || {}; if (lv && lv !== mmFirst(n)) S.cho[key] = lv; else delete S.cho[key]; mmCho.set(key, 1); /* 저장하면 💡 상자는 접고 첫 글자만 */ save(); close(); keepY(() => viewMSec()); toast("외우기 쉬운 말을 저장했어요 💡"); };
     }); });
   V.querySelectorAll("[data-phr]").forEach(b => b.onclick = () => { const key = `${s.n}:${b.dataset.phr}`; if (S.mnem) delete S.mnem[key]; if (S.cho) delete S.cho[key]; save(); keepY(() => viewMSec()); toast("처음 말로 되돌렸어요"); });
   const shownHere = () => [...mmShown].filter(k => k.startsWith(s.n + ":"));
