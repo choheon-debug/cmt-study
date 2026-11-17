@@ -136,6 +136,11 @@ textarea.inp{min-height:5rem;resize:vertical;line-height:1.5}
 .tabs3 button.on{background:#fff;color:var(--ink);box-shadow:0 1px 3px rgb(0 0 0 / .12)}
 .mtree{font-size:.98rem;line-height:1.45;padding:10px 8px}
 .mnd{display:flex;align-items:flex-start;gap:6px;width:100%;text-align:left;border:0;border-radius:10px;padding:8px 9px;margin:3px 0;font:inherit;color:inherit}
+.mcho{font-style:normal;flex:none;align-self:center;background:#fff7ed;color:#c2410c;border:1px solid #fdba74;border-radius:999px;padding:0 9px;font-size:.8rem;font-weight:800;white-space:nowrap}
+.mphr{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:0 0 6px 22px;background:#fff7ed;border:1px dashed #fdba74;border-radius:10px;padding:6px 10px;font-size:.92rem;line-height:1.5;color:#7c2d12}
+.mphr span{flex:1 1 12rem;font-weight:700}
+.mphr button{border:0;background:#fff;border-radius:999px;padding:3px 10px;font:inherit;font-size:.8rem;font-weight:800;color:#c2410c;box-shadow:0 0 0 1px #fdba74}
+.mhid{flex:1;background:#e5e7eb;color:#6b7280;border-radius:8px;padding:1px 10px;font-size:.88rem;font-weight:600}
 .mnd i{font-style:normal;width:14px;flex:none;color:var(--muted);font-size:.72rem;padding-top:4px}
 .mnd.l0{background:#ede9fe;color:#5b21b6;font-weight:800}
 .mnd.l1{background:#dbeafe;color:#1e40af;font-weight:800}
@@ -664,6 +669,12 @@ const mmCount = n => (n.c || []).reduce((a, c) => a + 1 + mmCount(c), 0);
 const mmSpeak = t => String(t).replace(/^(?:[ⅠⅡⅢⅣⅤⅥⅦⅧⅨⅩ]\s*|\d+\.\s*|\(\d+\)\s*|[①-⑳]\s*)/, "");
 const mmAt = (sec, p) => p.split(".").slice(1).reduce((n, i) => n.c[+i], sec);
 let mmOpen = new Set(), mmSec = 1, mmMode = "list", mmQ = "", mmZoom = 1;
+/* 🙈 가리기(목차 외우기): 가지 이름을 가려 두고, 누르면 하나씩 보여 줘요 */
+let mmHide = false; const mmShown = new Set(), mmCho = new Map();   // mmCho: 1 = 첫 글자, 2 = 첫 글자 + 외우기 쉬운 말
+const mmPhrase = (sn, q, n) => { const u = (S.mnem || {})[`${sn}:${q}`]; return u != null ? u : (n.h || ""); };
+/* 아래 가지들의 첫 글자 (예: 자·시·응) — 떠올리기 힌트 */
+const mmFirst = n => (n.c || []).map(c => (String(c.t).replace(/^\s*([ⅠⅡⅢⅣⅤⅥⅦⅧⅨⅩ]+\.?|\d+\.|\(\d+\)|[①-⑳])\s*/, '').match(/[가-힣A-Za-z0-9]/) || ['?'])[0]).join('·');
+const mmPre = t => (String(t).match(/^\s*([ⅠⅡⅢⅣⅤⅥⅦⅧⅨⅩ]+\.?|\d+\.|\(\d+\)|[①-⑳])/) || [])[1] || "";
 function mmWalk(n, p, f, lv = 0) { (n.c || []).forEach((c, i) => { const q = `${p}.${i}`; f(c, q, lv); mmWalk(c, q, f, lv + 1); }); }
 function viewMind() {
   const tot = MM.reduce((a, s) => a + 1 + mmCount(s), 0);
@@ -735,7 +746,7 @@ function viewMSec(arg = {}) {
   const s = MM.find(x => x.n === mmSec) || MM[0]; mmSec = s.n;
   const idx = MM.indexOf(s), nq = QS.filter(q => q.c === s.b).length, hasBook = BOOK.some(b => b.n === s.b);
   const list = (n, p, lv) => (n.c || []).map((c, i) => { const q = `${p}.${i}`, has = !!(c.c && c.c.length), o = mmOpen.has(q);
-    return `<div class="mi"><button class="mnd ${has ? "l" + Math.min(lv, 3) : "lf"}${hlCls(`m${s.n}:${q}`)}" data-p="${q}" data-hk="m${s.n}:${q}"><i>${has ? (o ? "▼" : "▶") : "•"}</i><span class="hx" style="flex:1">${esc(c.t)}</span>${(S.memo || {})[`m${s.n}:${q}`] ? `<em class="mn">📝</em>` : ""}${c.tb ? `<em class="mn" data-tbn>📊</em>` : ""}${c.n ? `<em class="mn">${c.n.length > 1 ? c.n.length : ""}💬</em>` : ""}</button>${has && o ? `<div class="mk">${list(c, q, lv + 1)}</div>` : ""}</div>`; }).join("");
+    return `<div class="mi"><button class="mnd ${has ? "l" + Math.min(lv, 3) : "lf"}${hlCls(`m${s.n}:${q}`)}" data-p="${q}" data-hk="m${s.n}:${q}"><i>${has ? (o ? "▼" : "▶") : "•"}</i>${mmHide && !mmShown.has(`${s.n}:${q}`) ? `${mmPre(c.t) ? `<b>${esc(mmPre(c.t))}</b>` : ""}<span class="mhid">👆 눌러서 보기</span>` : `<span class="hx" style="flex:1">${esc(c.t)}</span>`}${(S.memo || {})[`m${s.n}:${q}`] ? `<em class="mn">📝</em>` : ""}${mmHide && has ? `<em class="mcho" data-cho>${mmCho.get(`${s.n}:${q}`) ? esc(mmFirst(c)) : "🔤 첫 글자"}</em>` : ""}${c.tb ? `<em class="mn" data-tbn>📊</em>` : ""}${c.n ? `<em class="mn">${c.n.length > 1 ? c.n.length : ""}💬</em>` : ""}</button>${mmHide && has && mmCho.get(`${s.n}:${q}`) === 2 ? (ph => `<div class="mphr">💡 <span>${ph ? esc(ph) : "아직 외우기 쉬운 말이 없어요"}</span><button type="button" data-phe="${q}">✏️ ${ph ? "고치기" : "직접 쓰기"}</button>${(S.mnem || {})[`${s.n}:${q}`] != null && c.h ? `<button type="button" data-phr="${q}">↩ 처음 말로</button>` : ""}</div>`)(mmPhrase(s.n, q, c)) : ""}${has && o ? `<div class="mk">${list(c, q, lv + 1)}</div>` : ""}</div>`; }).join("");
   const map = (n, p, lv, col) => { const has = !!(n.c && n.c.length), o = mmOpen.has(p) || p === "r";
     const box = p === "r" ? `<span class="mx v0" style="--c:${SCOL[idx % SCOL.length]}">제${s.n}주차<br>${esc(s.t.split(" — ")[0])}</span>`
       : `<button class="mx ${lv === 0 ? "v0" : !has ? "vl" : lv === 1 ? "v1" : "v2"}${hlCls(`m${s.n}:${p}`)}" data-p="${p}" data-hk="m${s.n}:${p}"><span class="hx">${esc(n.t)}</span>${has && !o ? " ▸" : ""}</button>`;
@@ -750,6 +761,8 @@ function viewMSec(arg = {}) {
   $("#view").innerHTML = head(`제${s.n}주차`, esc(s.t), "mind") + `
   <div class="tabs3">${[["list", "📋 목록"], ["map", "🗺 가지 지도"], ["img", "🖼 원본"]].map(([k, l]) => `<button class="${mmMode === k ? "on" : ""}" data-m="${k}">${l}</button>`).join("")}</div>
   ${mmMode === "img" ? "" : `<div class="g2"><button class="btn b-gray" id="mOpen">➕ 모두 펼치기</button><button class="btn b-gray" id="mClose">➖ 모두 접기</button></div>
+  ${mmMode === "list" ? `<button class="btn ${mmHide ? "b-orange" : "b-gray"}" id="mHide">${mmHide ? "🙈 가리기 켜짐 · 누르면 끄기" : "🙈 가리기 (목차 외우기)"}<small>${mmHide ? "떠올려 본 뒤 눌러서 확인하세요" : "가지 이름을 가려 두고 하나씩 떠올려 봐요"}</small></button>
+  ${mmHide ? `<div class="g2"><button class="btn b-gray" id="mShowAll">👀 다 보기</button><button class="btn b-gray" id="mReHide">🙈 다시 가리기</button></div>` : ""}` : ""}
   <button class="btn b-purple" id="mListen">🔊 이 주차 듣기<small>가지를 누르면 펼치고, 요점(💬)을 누르면 설명이 나와요</small></button>
   ${hlBar()}`}
   ${body}
@@ -766,11 +779,27 @@ function viewMSec(arg = {}) {
   wireHl(() => keepY(() => viewMSec()));
   V.querySelectorAll("[data-p]").forEach(b => b.onclick = e => { const p = b.dataset.p, n = mmAt(s, p);
     if (e.target.closest("[data-tbn]") && n.tb) { tblZoom(n.tb); return; }
+    if (e.target.closest("[data-cho]")) { const k = `${s.n}:${p}`, v = mmCho.get(k) || 0; v >= 2 ? mmCho.delete(k) : mmCho.set(k, v + 1); keepY(() => viewMSec()); return; }
+    if (mmHide && mmMode === "list" && !mmShown.has(`${s.n}:${p}`)) { mmShown.add(`${s.n}:${p}`); keepY(() => viewMSec()); return; }
     if (hlMode) { hlSet(`m${s.n}:${p}`, hlColor); keepY(() => viewMSec()); return; }
     if (n.c && n.c.length) { mmOpen.has(p) ? mmOpen.delete(p) : mmOpen.add(p); const y = scrollY; viewMSec(); scrollTo(0, y); }
     else mmNote(s, p, () => keepY(() => viewMSec())); });
   $("#mOpen")?.addEventListener("click", () => { mmOpen = new Set(all()); viewMSec(); });
   $("#mClose")?.addEventListener("click", () => { mmOpen = new Set(); viewMSec(); });
+  V.querySelectorAll("[data-phe]").forEach(b => b.onclick = () => { const q = b.dataset.phe, n = mmAt(s, q), key = `${s.n}:${q}`, cur = mmPhrase(s.n, q, n);
+    modal("💡 외우기 쉬운 말", `<p class="sm" style="margin:0 0 6px">${esc(n.t)}</p><p style="margin:0 0 8px;font-weight:800;color:#c2410c">첫 글자: ${esc(mmFirst(n))}</p>
+      <textarea class="inp" id="phT" style="min-height:5rem" placeholder="첫 글자로 외우기 쉬운 말을 만들어 보세요">${esc(cur)}</textarea>
+      <p class="sm">내가 만든 말이 제일 잘 외워져요. 비우고 저장하면 말이 지워져요.</p>
+      <div class="g2 mt"><button class="btn b-gray" id="phX">취소</button><button class="btn b-teal" id="phOk">💾 저장</button></div>`, (m, close) => {
+      const t = m.querySelector("#phT"); setTimeout(() => t.focus(), 50);
+      m.querySelector("#phX").onclick = close;
+      m.querySelector("#phOk").onclick = () => { S.mnem = S.mnem || {}; S.mnem[key] = t.value.trim(); save(); close(); keepY(() => viewMSec()); toast("외우기 쉬운 말을 저장했어요 💡"); };
+    }); });
+  V.querySelectorAll("[data-phr]").forEach(b => b.onclick = () => { const key = `${s.n}:${b.dataset.phr}`; if (S.mnem) delete S.mnem[key]; save(); keepY(() => viewMSec()); toast("처음 말로 되돌렸어요"); });
+  const shownHere = () => [...mmShown].filter(k => k.startsWith(s.n + ":"));
+  $("#mHide")?.addEventListener("click", () => { mmHide = !mmHide; if (mmHide) { shownHere().forEach(k => mmShown.delete(k)); mmOpen = new Set(); } keepY(() => viewMSec()); toast(mmHide ? "가렸어요. 큰 가지부터 떠올려 보세요 🙈" : "가리기를 껐어요"); });
+  $("#mShowAll")?.addEventListener("click", () => { mmWalk(s, "r", (c, p) => mmShown.add(`${s.n}:${p}`)); keepY(() => viewMSec()); });
+  $("#mReHide")?.addEventListener("click", () => { shownHere().forEach(k => mmShown.delete(k)); [...mmCho.keys()].filter(k => k.startsWith(s.n + ":")).forEach(k => mmCho.delete(k)); keepY(() => viewMSec()); toast("다시 가렸어요 🙈"); });
   $("#mListen")?.addEventListener("click", () => { if (mmOpen.size < all().length) { mmOpen = new Set(all()); viewMSec(); } setTimeout(() => $("#mListen") && TTS.play(items(null)), 50); });
   const im = V.querySelector(".mimg img"), toRoot = () => { const w = V.querySelector(".mimg"); if (w && [6, 7, 8, 9, 10].includes(s.n)) w.scrollLeft = w.scrollWidth; };
   if (im) im.complete ? toRoot() : im.addEventListener("load", toRoot);
