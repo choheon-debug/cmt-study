@@ -63,8 +63,8 @@ header p{margin:3px 0 0;font-size:.84rem;color:var(--muted)}
 .icon{border:0;background:#eef0f3;border-radius:12px;min-width:44px;height:40px;font-size:1.05rem;padding:0 10px;font-weight:800}
 .icon.on{background:#fef3c7}
 .nav{position:fixed;left:0;right:0;bottom:0;z-index:20;padding:8px max(10px,env(safe-area-inset-right,0px)) calc(env(safe-area-inset-bottom,0px) + 8px) max(10px,env(safe-area-inset-left,0px));pointer-events:none}
-.nav nav{pointer-events:auto;max-width:36rem;margin:0 auto;background:#fff;border-radius:20px;box-shadow:0 4px 18px rgb(0 0 0 / .14);display:grid;grid-template-columns:repeat(5,1fr);padding:5px}
-.nav button{border:0;background:none;border-radius:14px;padding:5px 0;font-size:.74rem;white-space:nowrap;font-weight:800;color:var(--muted);display:flex;flex-direction:column;align-items:center}
+.nav nav{pointer-events:auto;max-width:36rem;margin:0 auto;background:#fff;border-radius:20px;box-shadow:0 4px 18px rgb(0 0 0 / .14);display:grid;grid-template-columns:repeat(6,1fr);padding:5px}
+.nav button{border:0;background:none;border-radius:14px;padding:5px 0;font-size:.7rem;white-space:nowrap;font-weight:800;color:var(--muted);display:flex;flex-direction:column;align-items:center}
 .nav button span{font-size:1.3rem}
 .nav button.on{background:var(--teal-l);color:#115e59}
 .toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 92px);transform:translateX(-50%);background:#1f2937;color:#fff;border-radius:12px;padding:11px 16px;font-size:.92rem;z-index:90;max-width:calc(100% - 32px);text-align:center}
@@ -210,6 +210,45 @@ mark.has-memo::after{content:"📝";font-size:.75em;margin-left:2px;vertical-ali
 .tbz .tc{align-self:flex-end;background:#fff;border:0;border-radius:999px;font-size:1.1rem;font-weight:800;padding:6px 14px;margin-bottom:10px}
 ._tk{text-shadow:0 0 0 transparent}
 ::highlight(tts){background-color:#dbeafe;color:inherit}
+.note{padding:12px 10px}
+.nhd{display:flex;align-items:center;gap:8px;margin-bottom:8px;font-weight:800;color:var(--muted);font-size:.9rem}.nd{border:1px solid #d1d5db;border-radius:8px;padding:5px 8px;font:inherit;background:#fff}
+.ngoal{display:grid;grid-template-columns:4.2em 1fr;border:1px solid #99f6e4;border-radius:10px;margin-bottom:10px;overflow:hidden}.ngoal b{grid-row:span 2;display:flex;align-items:center;justify-content:center;background:#f0fdfa;color:#0f766e;font-size:.8rem;text-align:center;border-right:1px solid #99f6e4}.ngoal div{border-bottom:1px solid #ccfbf1}.ngoal div:last-child{border:0}
+.ngrid{border-top:1px solid #cbd5e1}
+.nr{display:grid;grid-template-columns:45% 1fr;border-bottom:1px solid #cbd5e1;min-height:2.6rem}
+.nk{border-right:2px solid #ef4444;padding:7px 6px 6px 0;font-weight:700;line-height:1.35;font-size:.9rem}
+.nk.l0{color:#7c3aed;font-size:1rem}.nk.l1{color:#1d4ed8;padding-left:.9em}.nk.l2{color:#0f766e;padding-left:1.8em}.nk.l3{padding-left:2.7em;font-weight:600;color:#1f2937}
+.nr.gap{min-height:1.4rem}.nr.gap div:first-child{border-right:2px solid #ef4444}
+.nt{width:100%;border:0;background:transparent;font:inherit;font-size:.95rem;line-height:1.45;padding:7px 6px;resize:none;overflow:hidden;color:#111827;display:block}
+.nt:focus{outline:none;background:#fefce8}
+.nsum{border:1.5px solid #0f766e;border-radius:10px;margin:10px 0;overflow:hidden}.nst{padding:8px 10px;font-weight:800;color:#0f766e;border-bottom:1px solid #99f6e4;font-size:.92rem}.nsl{border-bottom:1px solid #cbd5e1}.nsl:last-child{border:0}
+#printArea{display:none}
+.nlist .row{cursor:pointer}
+/* 🖨 인쇄: A4, 칸 높이 1cm */
+/* 노트 A4 모양 (인쇄와 PDF 공유가 같이 씀) */
+.pa{color:#1f2937;font-family:"Pretendard","Apple SD Gothic Neo","Noto Sans KR",sans-serif;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.pa *{box-sizing:border-box}
+.pa .psec+.psec{break-before:page}
+.pa .ph{display:flex;align-items:flex-end;gap:10px;border-bottom:2px solid #0f766e;padding-bottom:2mm;margin-bottom:5mm}.pa .ph h1{font-size:15pt;margin:0;flex:1;color:#0f766e}.pa .ph span{font-size:9pt;color:#6b7280;white-space:nowrap}
+.pa .pgoal{display:grid;grid-template-columns:20mm 1fr;border:1px solid #99f6e4;border-radius:2mm;margin-bottom:4mm;break-inside:avoid}.pa .pgoal b{display:flex;align-items:center;justify-content:center;text-align:center;font-size:9pt;color:#0f766e;background:#f0fdfa;border-right:1px solid #99f6e4}
+.pa .pr2 div{height:10mm;display:flex;align-items:center;padding:0 2mm;font-size:10pt;color:#374151;border-bottom:1px solid #ccfbf1}.pa .pr2 div:last-child{border:0}
+.pa .pr{display:grid;grid-template-columns:88mm 1fr;height:10mm;border-bottom:1px solid #cbd5e1;break-inside:avoid}
+.pa .pr:first-of-type{border-top:1px solid #cbd5e1}
+.pa .pr.fill{height:auto;min-height:10mm}
+.pa .pk{border-right:2px solid #ef4444;display:flex;align-items:center;padding-right:2mm;font-weight:800;line-height:1.15;overflow:hidden}
+.pa .pk.l0{font-size:14pt;color:#7c3aed}.pa .pk.l1{font-size:13pt;color:#1d4ed8;padding-left:12pt}.pa .pk.l2{font-size:12.5pt;color:#0f766e;padding-left:24pt}.pa .pk.l3{font-size:12pt;font-weight:700;padding-left:36pt}
+.pa .pn{display:inline-block;width:1.3em;flex:none}
+.pa .pk.lng{font-size:10pt!important}
+.pa .pw{display:flex;align-items:center;padding:1mm 2mm;font-size:10.5pt;line-height:1.35;white-space:pre-wrap;color:#111827}
+.pa .psum{border:1.5px solid #0f766e;border-radius:2mm;margin:4mm 0;padding:0 3mm;break-inside:avoid}
+.pa .pst{height:10mm;display:flex;align-items:center;gap:5px;border-bottom:1px solid #99f6e4;font-size:10pt;color:#0f766e}.pa .pst span{font-size:8pt;color:#6b7280}
+.pa .psl{min-height:10mm;border-bottom:1px solid #cbd5e1;display:flex;align-items:center;font-size:10.5pt;white-space:pre-wrap}.pa .psl:last-child{border:0}
+.pdfgen{position:fixed;left:-10000px;top:0;width:184mm;background:#fff;display:block}.pdfgen .pg{width:184mm;background:#fff}
+@media print{
+  @page{size:A4;margin:12mm 12mm 12mm 14mm}
+  body.printing>*:not(#printArea){display:none!important}
+  body.printing{background:#fff!important;margin:0;padding:0}
+  body.printing #printArea{display:block}
+}
 </style>
 </head>
 <body>
@@ -367,14 +406,14 @@ function speakQuestion(q, opts, withAnswer) {
 
 /* ---------- 화면 틀 ---------- */
 let tab = "home";
-const TABS = [["home", "🏠", "홈"], ["mind", "🧠", "마인드맵"], ["quiz", "✏️", "문제"], ["cards", "🃏", "암기카드"], ["book", "📖", "교재"]];
-function nav() { $("#nav").innerHTML = TABS.map(([k, e, l]) => `<button class="${tab === k || ({ msec: "mind", section: "book" })[tab] === k ? "on" : ""}" data-t="${k}"><span>${e}</span>${l}</button>`).join(""); $("#nav").querySelectorAll("button").forEach(b => b.onclick = () => go(b.dataset.t)); }
+const TABS = [["home", "🏠", "홈"], ["mind", "🧠", "마인드맵"], ["quiz", "✏️", "문제"], ["cards", "🃏", "암기카드"], ["book", "📖", "교재"], ["note", "📄", "노트"]];
+function nav() { $("#nav").innerHTML = TABS.map(([k, e, l]) => `<button class="${tab === k || ({ msec: "mind", section: "book", nsec: "note" })[tab] === k ? "on" : ""}" data-t="${k}"><span>${e}</span>${l}</button>`).join(""); $("#nav").querySelectorAll("button").forEach(b => b.onclick = () => go(b.dataset.t)); }
 function go(t, arg) {
   if (t !== tab) hlMode = false;
   if (mock && t !== "mock") { if (!confirm("모의고사를 그만둘까요? 지금까지 푼 것은 저장되지 않아요.")) return; mock = null; }
   if (t !== "mock") stopMock();
   TTS.stop(true); tab = t; nav();
-  ({ home: viewHome, quiz: viewQuizMenu, cards: viewCards, book: viewBook, mind: viewMind, msec: viewMSec, session: viewSession, mock: viewMock, result: viewResult, section: viewSection })[t](arg);
+  ({ home: viewHome, quiz: viewQuizMenu, cards: viewCards, book: viewBook, mind: viewMind, msec: viewMSec, session: viewSession, mock: viewMock, result: viewResult, section: viewSection, note: viewNoteHome, nsec: viewNote })[t](arg);
   scrollTo(0, 0);
 }
 const head = (title, sub, back) => `<header>${back ? `<button class="back" data-back="${back}">‹ 뒤로</button>` : ""}<h1>${title}</h1>${sub ? `<p>${sub}</p>` : ""}<button class="gear" data-set aria-label="설정">⚙</button></header>`;
@@ -644,6 +683,7 @@ function viewSection(arg) {
   <p class="sm" style="text-align:center;margin:0">${hlMode ? "칠하기 중에는 읽어 주지 않아요" : "글을 누르면 그 줄부터 읽어 줘요"}</p>
   <section class="card book">${html || `<p class="sm">시험 포인트가 없는 주차예요.</p>`}</section>
   ${nq ? `<button class="btn b-teal" id="sQuiz">✏️ 이 주차 문제 ${nq}개 풀기</button>` : ""}
+  ${MM.some(m => m.n === s.n) ? `<button class="btn b-orange" id="sNote">📄 제${s.n}절 노트<small>코넬식 · 앱에서 쓰고 A4 PDF로 공유</small></button>` : ""}
   <div class="g2">${s.n > 1 ? `<button class="btn b-gray" id="sPrev">‹ ${s.n - 1}주차</button>` : "<span></span>"}${s.n < BOOK.length ? `<button class="btn b-gray" id="sNextSec">${s.n + 1}주차 ›</button>` : ""}</div>`;
   wireHead();
   const items = from => blocks.map((b, i) => ({ b, i })).slice(from).filter(({ b }) => b.t !== "table").map(({ b, i }) => ({
@@ -655,6 +695,7 @@ function viewSection(arg) {
     TTS.play(items(i)); });
   if (arg.focus != null) setTimeout(() => { const j = blocks.indexOf(s.blocks[arg.focus]), el = $(`#view [data-r="${j}"]`); if (el) { el.scrollIntoView({ block: "center" }); el.classList.add("reading"); setTimeout(() => el.classList.remove("reading"), 2500); } }, 30);
   $("#sOnly").onclick = () => { secOnly = !secOnly; viewSection(arg); };
+  $("#sNote")?.addEventListener("click", () => go("nsec", { n: s.n, from: "book" }));
   $("#sQuiz")?.addEventListener("click", () => startSession(shuffle(QS.filter(q => q.c === s.n).map(q => q.id)).slice(0, 20), `✏️ ${s.n}주차 문제`));
   $("#sPrev")?.addEventListener("click", () => go("section", { n: s.n - 1 }));
   $("#sNextSec")?.addEventListener("click", () => go("section", { n: s.n + 1 }));
@@ -766,6 +807,7 @@ function viewMSec(arg = {}) {
   <button class="btn b-purple" id="mListen">🔊 이 주차 듣기<small>가지를 누르면 펼치고, 요점(💬)을 누르면 설명이 나와요</small></button>
   ${hlBar()}`}
   ${body}
+  <button class="btn b-orange" id="mNote">📄 제${s.n}절 노트<small>코넬식 · 앱에서 쓰고 A4 PDF로 공유</small></button>
   <div class="g2">${hasBook ? `<button class="btn b-teal" id="mBook">📖 교재 ${s.b}주차</button>` : "<span></span>"}${nq ? `<button class="btn b-blue" id="mQuiz">✏️ 문제 ${Math.min(nq, 20)}개</button>` : ""}</div>
   <div class="g2">${idx > 0 ? `<button class="btn b-gray" id="mPrev">‹ ${MM[idx - 1].n}주차</button>` : "<span></span>"}${idx < MM.length - 1 ? `<button class="btn b-gray" id="mNext">${MM[idx + 1].n}주차 ›</button>` : ""}</div>`;
   wireHead();
@@ -809,6 +851,7 @@ function viewMSec(arg = {}) {
   $("#zIn")?.addEventListener("click", () => { mmZoom = Math.min(4, mmZoom + 0.5); V.querySelector(".mimg img").style.width = mmZoom * 100 + "%"; toRoot(); });
   $("#zOut")?.addEventListener("click", () => { mmZoom = Math.max(1, mmZoom - 0.5); V.querySelector(".mimg img").style.width = mmZoom * 100 + "%"; toRoot(); });
   $("#mBook")?.addEventListener("click", () => go("section", { n: s.b, from: "msec" }));
+  $("#mNote")?.addEventListener("click", () => go("nsec", { n: s.n, from: "msec" }));
   $("#mQuiz")?.addEventListener("click", () => startSession(shuffle(QS.filter(q => q.c === s.b).map(q => q.id)).slice(0, 20), `✏️ ${s.b}주차 문제`));
   $("#mPrev")?.addEventListener("click", () => { mmSec = MM[idx - 1].n; mmOpen = new Set(); go("msec"); });
   $("#mNext")?.addEventListener("click", () => { mmSec = MM[idx + 1].n; mmOpen = new Set(); go("msec"); });
@@ -961,6 +1004,172 @@ new MutationObserver(() => setTimeout(() => hlApplyAll($("#view")), 0)).observe(
 setTimeout(() => hlApplyAll($("#view")), 0);
 
 
+/* ---------- 📄 코넬식 노트 ----------
+   마인드맵 목차로 만든 A4 노트. 앱에서 직접 쓰고(휴대폰에 저장), 빈 노트나 쓴 노트를 그대로 인쇄해요.
+   인쇄는 칸 높이 1cm, ①② 요점 11포인트, 단계마다 한 글자 들여쓰기, 로마자 목차마다 요약 3줄. */
+function NSEC() { return MM; }                 /* 노트로 쓰는 절 목록 (앱마다 다를 수 있음) */
+const nLbl = s => s.k || `제${s.n}절`;          /* 화면에 보이는 절 이름 */
+const noteS = n => { S.note = S.note || {}; return (S.note[n] = S.note[n] || { d: "", g: ["", ""], r: {}, s: {} }); };
+function noteRows(s) {
+  const out = []; let cur = null;
+  mmWalk(s, "r", (c, q, lv) => {
+    if (lv === 0) { if (cur) out.push({ k: "sum", q: cur.q, t: cur.t }, { k: "gap" }); cur = { q, t: c.t }; }
+    out.push({ k: "row", q, t: c.t, lv: Math.min(lv, 3), leaf: !(c.c && c.c.length) });
+  });
+  if (cur) out.push({ k: "sum", q: cur.q, t: cur.t });
+  return out;
+}
+let noteSec = 1;
+function viewNote(arg = {}) {
+  if (!window.MM) return mmWait("nsec", () => viewNote(arg));
+  if (arg.n) noteSec = arg.n;
+  const s = NSEC().find(x => x.n === noteSec) || NSEC()[0], N = noteS(s.n), rows = noteRows(s), from = arg.from || "note";
+  const ta = (key, val, ph) => `<textarea class="nt" rows="1" data-nk="${key}" placeholder="${ph || ""}">${esc(val || "")}</textarea>`;
+  const filled = Object.values(N.r).filter(Boolean).length + Object.values(N.s).flat().filter(Boolean).length;
+  $("#view").innerHTML = head(`${nLbl(s).length > 5 ? "" : "📄 "}${nLbl(s)} 노트`, esc(s.t), from) + `
+  <div class="g2"><button class="btn b-gray" id="nPrintB">📤 빈 노트 공유<small>A4 PDF · 칸만</small></button><button class="btn b-teal" id="nPrintF">📤 쓴 노트 공유<small>A4 PDF · 쓴 내용까지</small></button></div>
+  <p class="sm" style="text-align:center;margin:0">왼쪽 목차를 보고 <b>책을 덮고</b> 오른쪽 칸에 떠올려 써 보세요 · 쓴 칸 ${filled}개 · 자동 저장</p>
+  <section class="card note">
+    <div class="nhd"><span>날짜</span><input class="nd" type="date" data-nk="d" value="${esc(N.d)}"></div>
+    <div class="ngrid">${rows.map(r => r.k === "gap" ? `<div class="nr gap"><div></div><div></div></div>`
+      : r.k === "sum" ? `<div class="nsum"><div class="nst">📝 ${esc(r.t)} 요약 3줄 <span class="sm">— 책 덮고 핵심을 세 줄로</span></div>${[0, 1, 2].map(i => `<div class="nsl">${ta(`s:${r.q}:${i}`, (N.s[r.q] || [])[i], "")}</div>`).join("")}</div>`
+      : `<div class="nr"><div class="nk l${r.lv}">${esc(r.t)}</div><div class="nw">${ta(`r:${r.q}`, N.r[r.q], r.leaf ? "떠올려 쓰기" : "")}</div></div>`).join("")}</div>
+  </section>
+  <div class="g2">${NSEC().indexOf(s) > 0 ? `<button class="btn b-gray" id="nPrev">‹ ${nLbl(NSEC()[NSEC().indexOf(s) - 1])} 노트</button>` : "<span></span>"}${NSEC().indexOf(s) < NSEC().length - 1 ? `<button class="btn b-gray" id="nNextS">${nLbl(NSEC()[NSEC().indexOf(s) + 1])} 노트 ›</button>` : ""}</div>
+  ${filled ? `<button class="btn b-gray" id="nClear" style="padding:9px">🗑 이 절 노트 지우기</button>` : ""}`;
+  wireHead();
+  const V = $("#view"), grow = t => { t.style.height = "auto"; t.style.height = t.scrollHeight + "px"; };
+  let tm = 0;
+  V.querySelectorAll("[data-nk]").forEach(el => {
+    if (el.tagName === "TEXTAREA") grow(el);
+    el.addEventListener("input", () => {
+      const k = el.dataset.nk, v = el.value;
+      if (k === "d") N.d = v; else if (k === "g0" || k === "g1") N.g[+k[1]] = v;
+      else if (k.startsWith("r:")) { const q = k.slice(2); if (v.trim()) N.r[q] = v; else delete N.r[q]; }
+      else { const [, q, i] = k.split(":"); N.s[q] = N.s[q] || ["", "", ""]; N.s[q][+i] = v; }
+      if (el.tagName === "TEXTAREA") grow(el);
+      clearTimeout(tm); tm = setTimeout(save, 400);
+    });
+  });
+  $("#nPrintB").onclick = () => notePrint(s, false);
+  $("#nPrintF").onclick = () => { save(); notePrint(s, true); };
+  $("#nPrev")?.addEventListener("click", () => go("nsec", { n: NSEC()[NSEC().indexOf(s) - 1].n, from }));
+  $("#nNextS")?.addEventListener("click", () => go("nsec", { n: NSEC()[NSEC().indexOf(s) + 1].n, from }));
+  $("#nClear")?.addEventListener("click", () => { if (confirm(`${nLbl(s)} 노트에 쓴 내용을 모두 지울까요?`)) { delete S.note[s.n]; save(); viewNote(); toast("지웠어요"); } });
+}
+function viewNoteHome() {
+  if (!window.MM) return mmWait("note", viewNoteHome);
+  const cnt = n => { const N = (S.note || {})[n]; return N ? Object.values(N.r).filter(Boolean).length + Object.values(N.s).flat().filter(Boolean).length : 0; };
+  const tot = n => noteRows(NSEC().find(m => m.n === n)).filter(r => r.k === "row").length;
+  $("#view").innerHTML = head("📄 노트", "코넬식 · 앱에서 쓰고 A4 PDF로 공유") + `
+  <section class="card"><div class="t">이렇게 써요</div><p class="sm" style="line-height:1.7;margin:0">① 절을 골라 노트를 열어요 → ② 왼쪽 목차를 보고 <b>책을 덮고</b> 오른쪽 칸에 떠올려 써요<br>③ 로마자 목차가 끝나면 <b>요약 3줄</b> → ④ 교재와 비교해 고쳐요 · 쓴 내용은 자동 저장</p></section>
+  <div class="g2"><button class="btn b-gray" id="naB">📤 전체 빈 노트<small>모든 절 PDF · 칸만</small></button><button class="btn b-teal" id="naF">📤 전체 쓴 노트<small>모든 절 PDF · 쓴 내용</small></button></div>
+  <section class="card nlist"><div class="t">절 고르기 <span>쓴 칸 / 목차 수</span></div>
+    ${NSEC().map(m => { const c = cnt(m.n), t = tot(m.n); return `<div class="row" data-nn="${m.n}"><span class="main"><b>${nLbl(m)}</b> ${esc(m.t)}</span><span class="sm">${c ? `<b style="color:var(--teal)">${c}</b>/${t}` : `-/${t}`} ›</span></div>`; }).join("")}
+  </section>
+  <p class="sm" style="text-align:center">인쇄소에 PDF를 줄 때 <b>A4 · 실제 크기(100%)</b>로 뽑아 달라고 하면 칸이 1cm예요.</p>`;
+  wireHead();
+  $("#view").querySelectorAll("[data-nn]").forEach(r => r.onclick = () => go("nsec", { n: +r.dataset.nn }));
+  $("#naB").onclick = () => notePrint(NSEC(), false);
+  $("#naF").onclick = () => notePrint(NSEC(), true);
+}
+/* 인쇄: 화면 대신 A4 노트만 보이게 해서 인쇄 창을 열어요 */
+function notePrintBody(s, withText) {
+  const N = noteS(s.n), rows = noteRows(s);
+  // 왼쪽 칸에 안 들어가는 긴 목차는 글자를 조금 줄여 두 줄로 (칸 높이는 그대로 1cm)
+  const fits = (t, lv) => { const pt = [14, 13, 12.5, 12][lv], avail = (88 - 2) / 0.3528 - lv * 12; let w = 0; for (const ch of t) w += /[가-힣ㄱ-ㅎ①-⑳ⅠⅡⅢⅣⅤⅥⅦⅧⅨⅩ]/.test(ch) ? 1 : 0.56; return w * pt <= avail; };
+  const txt = v => withText && v ? esc(v) : "";
+  return `<div class="psec"><div class="ph"><h1>${esc(nLbl(s))} ${esc(s.t)}</h1><span>${withText && N.d ? N.d.replace(/-/g, ". ") : "____년 __월 __일"}</span></div>
+  ${rows.map(r => r.k === "gap" ? `<div class="pr"><div class="pk"></div><div class="pw"></div></div>`
+    : r.k === "sum" ? `<div class="psum"><div class="pst"><b>📝 ${esc(r.t)} 요약 3줄</b> <span>— 책 덮고 이 부분 핵심을 세 줄로</span></div>${[0, 1, 2].map(i => `<div class="psl">${txt((N.s[r.q] || [])[i])}</div>`).join("")}</div>`
+    : `<div class="pr${withText ? " fill" : ""}"><div class="pk l${r.lv}${fits(r.t, r.lv) ? "" : " lng"}">${esc(r.t).replace(/^([①-⑳])\s*/, '<span class="pn">$1</span>')}</div><div class="pw">${txt(N.r[r.q])}</div></div>`).join("")}</div>`;
+}
+const APPNAME = "CMT";
+const isApp = () => navigator.standalone || matchMedia("(display-mode: standalone)").matches;
+function notePrint(list, withText) {
+  list = Array.isArray(list) ? list : [list];
+  const name = `${APPNAME}_${list.length === 1 ? nLbl(list[0]).replace(/\s+/g, "") : "전체"}_${withText ? "쓴노트" : "빈노트"}.pdf`;
+  modal("📤 노트 공유하기", `<p style="margin-top:0">A4 PDF 파일로 만들어요. 카톡·메일로 보내거나 파일에 저장해서 <b>인쇄소</b>에 주면 돼요.</p>
+    <div class="now" id="pdfSt" style="min-height:0">PDF 만드는 중…${list.length > 20 ? "<br><small>쪽수가 많아서 1분쯤 걸릴 수 있어요. 화면을 끄지 말고 기다려 주세요.</small>" : ""}</div><div id="pdfBtns" style="display:grid;gap:10px;margin-top:12px"></div>`, async (m, close) => {
+    const st = m.querySelector("#pdfSt"), bt = m.querySelector("#pdfBtns");
+    try {
+      const { blob, n } = await notePdf(list, withText, (i, k) => { st.textContent = `PDF 만드는 중… ${i} / ${k}쪽`; });
+      if (!m.isConnected) return;
+      const file = new File([blob], name, { type: "application/pdf" }), url = URL.createObjectURL(blob);
+      const canShare = !!navigator.canShare?.({ files: [file] });
+      st.textContent = `✅ 다 만들었어요 · ${n}쪽 · ${(blob.size / 1048576).toFixed(1)}MB`;
+      bt.innerHTML = (canShare ? `<button class="btn b-teal" id="pdfShare">📤 공유하기<small>카톡 · 메일 · 파일에 저장</small></button>` : "") +
+        `<a class="btn ${canShare ? "b-gray" : "b-teal"}" href="${url}" download="${esc(name)}" style="display:block;text-align:center;text-decoration:none">💾 파일로 저장<small style="display:block">${esc(name)}</small></a>` +
+        (isApp() ? "" : `<button class="btn b-gray" id="pdfPrint">🖨 바로 인쇄</button>`) +
+        `<p class="sm" style="margin:0">인쇄소에는 <b>A4 · 실제 크기(100%)</b>로 뽑아 달라고 하세요. 그래야 칸이 1cm예요.</p>`;
+      m.querySelector("#pdfShare")?.addEventListener("click", () => navigator.share({ files: [file], title: name }).catch(e => { if (e.name !== "AbortError") toast("공유하지 못했어요. '파일로 저장'을 눌러 주세요"); }));
+      m.querySelector("#pdfPrint")?.addEventListener("click", () => { close(); notePrintNow(list, withText); });
+    } catch (e) { console.error(e); st.textContent = "PDF를 만들지 못했어요. 인터넷이 연결됐는지 확인하고 다시 눌러 주세요."; }
+  });
+}
+/* PDF 만들기: 노트를 A4 쪽으로 나눠 그림으로 찍어 넣는다 (글꼴 걱정 없음) */
+let pdfLib;
+function pdfLibs() {
+  return pdfLib ||= Promise.all(["lib/html2canvas.min.js", "lib/jspdf.umd.min.js"].map(src => new Promise((ok, no) => {
+    const t = document.createElement("script"); t.src = src; t.onload = ok; t.onerror = () => { pdfLib = null; no(new Error("load " + src)); }; document.head.appendChild(t);
+  })));
+}
+async function notePdf(list, withText, prog) {
+  await pdfLibs();
+  const box = document.createElement("div"); box.className = "pa pdfgen"; document.body.appendChild(box);
+  try {
+    const px = v => v * 96 / 25.4, H = px(273 - 1), pages = [];
+    for (const s of list) {
+      box.innerHTML = notePrintBody(s, withText);
+      let cur = [], used = 0;
+      const els = [...box.firstElementChild.children];
+      const hOf = el => { if (!el) return 0; const cs = getComputedStyle(el); return el.getBoundingClientRect().height + parseFloat(cs.marginTop) + parseFloat(cs.marginBottom); };
+      els.forEach((el, k) => {
+        const h = hOf(el);
+        const gap = el.classList.contains("pr") && !el.textContent.trim() && !el.classList.contains("fill");
+        const headRow = !!el.querySelector(".pk.l0,.pk.l1,.pk.l2");   /* 제목 줄은 다음 줄과 같은 쪽에 */
+        if (cur.length && used + h + (headRow ? hOf(els[k + 1]) : 0) > H) { while (cur.length && cur[cur.length - 1].gap) cur.pop(); pages.push(cur); cur = []; used = 0; }
+        if (gap && !cur.length) return;   /* 쪽 맨 위 빈 줄은 빼기 */
+        cur.push({ h: el.outerHTML, gap }); used += h;
+      });
+      if (cur.length) pages.push(cur);
+    }
+    const pdf = new window.jspdf.jsPDF({ unit: "mm", format: "a4", compress: true });
+    for (let i = 0; i < pages.length; i++) {
+      box.innerHTML = `<div class="psec pg">${pages[i].map(x => x.h).join("")}</div>`;
+      const c = await html2canvas(box.firstElementChild, { scale: list.length > 20 ? 2 : 2.5, backgroundColor: "#ffffff", logging: false });
+      if (i) pdf.addPage();
+      pdf.addImage(c.toDataURL("image/jpeg", list.length > 20 ? 0.75 : 0.85), "JPEG", 14, 12, 184, 184 * c.height / c.width);
+      c.width = c.height = 0; prog(i + 1, pages.length);
+      await new Promise(r => setTimeout(r, 0));
+    }
+    return { blob: pdf.output("blob"), n: pages.length };
+  } finally { box.remove(); }
+}
+function notePrintNow(list, withText) {
+  const body = list.map(x => notePrintBody(x, withText)).join("");
+  let a = document.getElementById("printArea"); if (!a) { a = document.createElement("div"); a.id = "printArea"; a.className = "pa"; document.body.appendChild(a); }
+  a.innerHTML = body; document.body.classList.add("printing");
+  /* 누른 순간 바로 print() (인쇄용 칸은 화면에 안 보이니 지우지 않고 둔다) */
+  try { window.print(); } catch (e) { }
+}
+/* Safari에서 인쇄용 주소로 열렸을 때 */
+function notePrintPage() {
+  let p; try { p = JSON.parse(decodeURIComponent(location.hash.slice(7))); } catch { return false; }
+  const list = (p.n || []).map(n => NSEC().find(s => s.n === n)).filter(Boolean); if (!list.length) return false;
+  if (p.f) S.note = Object.assign({}, S.note, p.d || {});
+  $("#view").innerHTML = `<header><h1>🖨 노트 인쇄</h1><p>${list.length === 1 ? `${esc(nLbl(list[0]))} ${esc(list[0].t)}` : `전체 ${list.length}개 절`} · ${p.f ? "쓴 내용까지" : "빈 노트"}</p></header>
+  <div class="card"><button class="btn b-teal" id="ppGo" style="font-size:1.15rem;padding:18px">🖨 인쇄하기</button>
+  <p class="sm mt">인쇄 창이 안 뜨면: 화면 위쪽(또는 아래쪽)의 <b>공유 버튼(□↑)</b> → <b>프린트</b>를 눌러 주세요.<br>프린트 화면에서 <b>PDF로 저장</b>도 할 수 있어요.</p>
+  <p class="sm">인쇄를 마치면 이 Safari 창은 닫아도 돼요.</p></div>`;
+  const body = list.map(x => notePrintBody(x, !!p.f)).join("");
+  let a = document.getElementById("printArea"); if (!a) { a = document.createElement("div"); a.id = "printArea"; a.className = "pa"; document.body.appendChild(a); }
+  a.innerHTML = body; document.body.classList.add("printing");
+  $("#ppGo").onclick = () => { try { window.print(); } catch (e) { } };
+  document.querySelector(".nav").style.display = "none";
+  return true;
+}
+
 /* ---------- 🎧 듣기 공부 ---------- */
 function listenPoints() {
   const pts = BOOK.flatMap(s => s.blocks.filter(b => KEYK.includes(b.k)).map((b, i) => ({ s, b })));
@@ -1050,7 +1259,7 @@ function openSettings() {
   });
 }
 
-go("home");
+if (!(location.hash.startsWith("#print=") && notePrintPage())) go("home");
 if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});
 </script>
 </body>
