@@ -1088,6 +1088,19 @@ const APPNAME = "CMT";
 const isApp = () => navigator.standalone || matchMedia("(display-mode: standalone)").matches;
 function notePrint(list, withText) {
   list = Array.isArray(list) ? list : [list];
+  /* 절 화면에서 누르면 먼저 물어본다: 전체(기본) 또는 이 절만 */
+  if (list.length === 1 && NSEC().length > 1) {
+    modal("📤 노트 공유하기", `<p style="margin-top:0">어디까지 PDF로 만들까요?</p><div style="display:grid;gap:10px">
+      <button class="btn b-teal" id="pkAll">📚 전체 절<small>모든 절 ${NSEC().length}개를 한 파일로</small></button>
+      <button class="btn b-gray" id="pkOne">📄 이 절만<small>${esc(nLbl(list[0]))} ${esc(list[0].t)}</small></button></div>`, (m, close) => {
+      m.querySelector("#pkAll").onclick = () => { close(); noteMake(NSEC(), withText); };
+      m.querySelector("#pkOne").onclick = () => { close(); noteMake(list, withText); };
+    });
+    return;
+  }
+  noteMake(list, withText);
+}
+function noteMake(list, withText) {
   const name = `${APPNAME}_${list.length === 1 ? nLbl(list[0]).replace(/\s+/g, "") : "전체"}_${withText ? "쓴노트" : "빈노트"}.pdf`;
   modal("📤 노트 공유하기", `<p style="margin-top:0">A4 PDF 파일로 만들어요. 카톡·메일로 보내거나 파일에 저장해서 <b>인쇄소</b>에 주면 돼요.</p>
     <div class="now" id="pdfSt" style="min-height:0">PDF 만드는 중…${list.length > 20 ? "<br><small>쪽수가 많아서 1분쯤 걸릴 수 있어요. 화면을 끄지 말고 기다려 주세요.</small>" : ""}</div><div id="pdfBtns" style="display:grid;gap:10px;margin-top:12px"></div>`, async (m, close) => {
@@ -1128,9 +1141,16 @@ async function notePdf(list, withText, prog) {
         const h = hOf(el);
         const gap = el.classList.contains("pr") && !el.textContent.trim() && !el.classList.contains("fill");
         const headRow = !!el.querySelector(".pk.l0,.pk.l1,.pk.l2");   /* 제목 줄은 다음 줄과 같은 쪽에 */
-        if (cur.length && used + h + (headRow ? hOf(els[k + 1]) : 0) > H) { while (cur.length && cur[cur.length - 1].gap) cur.pop(); pages.push(cur); cur = []; used = 0; }
+        if (cur.length && used + h + (headRow ? hOf(els[k + 1]) : 0) > H) {
+          while (cur.length && cur[cur.length - 1].gap) cur.pop();
+          /* 요약 상자가 혼자 다음 쪽으로 가지 않게, 바로 앞 두 줄을 같이 넘긴다 */
+          const carry = el.classList.contains("psum") && cur.length > 4 ? cur.splice(-2) : [];
+          while (carry.length && cur.length > 2 && cur[cur.length - 1].hd) carry.unshift(cur.pop());   /* 따라가는 줄의 제목도 같이 */
+          while (cur.length && cur[cur.length - 1].gap) cur.pop();
+          pages.push(cur); cur = carry; used = carry.reduce((t, x) => t + x.hh, 0);
+        }
         if (gap && !cur.length) return;   /* 쪽 맨 위 빈 줄은 빼기 */
-        cur.push({ h: el.outerHTML, gap }); used += h;
+        cur.push({ h: el.outerHTML, gap, hh: h, hd: headRow }); used += h;
       });
       if (cur.length) pages.push(cur);
     }
@@ -1140,6 +1160,7 @@ async function notePdf(list, withText, prog) {
       const c = await html2canvas(box.firstElementChild, { scale: list.length > 20 ? 2 : 2.5, backgroundColor: "#ffffff", logging: false });
       if (i) pdf.addPage();
       pdf.addImage(c.toDataURL("image/jpeg", list.length > 20 ? 0.75 : 0.85), "JPEG", 14, 12, 184, 184 * c.height / c.width);
+      pdf.setFontSize(9); pdf.setTextColor(120); pdf.text(`${i + 1} / ${pages.length}`, 105, 291, { align: "center" });   /* 쪽 번호 */
       c.width = c.height = 0; prog(i + 1, pages.length);
       await new Promise(r => setTimeout(r, 0));
     }
