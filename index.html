@@ -255,6 +255,12 @@ mark.has-memo::after{content:"📝";font-size:.75em;margin-left:2px;vertical-ali
 .srow{display:block;width:100%;text-align:left;border:0;background:none;border-top:1px solid #eef0f3;padding:10px 2px;font:inherit;color:inherit;line-height:1.5}
 .srg .t+.srow{border-top:0}.srow b{display:block;font-size:1rem}.srow .sm{display:block}.sm2{font-size:.92rem;color:#374151;margin-top:2px}
 .srow mark{background:#fef08a;color:inherit;border-radius:3px;padding:0 1px}.smore{margin-top:8px;padding:9px}
+/* 🧭 전체 목차 외우기 */
+.toc summary{cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:baseline;gap:8px;font-size:1.05rem}.toc summary::-webkit-details-marker{display:none}
+.tocs{background:#fefce8;border:1px solid #fde68a;border-radius:12px;padding:9px 11px;margin:10px 0;line-height:1.65;font-weight:700;font-size:.95rem}
+.toct{width:100%;border-collapse:collapse;margin-top:6px}.toct th,.toct td{border-bottom:1px solid #e5e7eb;padding:7px 4px;text-align:left;vertical-align:top;font-size:.88rem;line-height:1.5}.toct th{font-size:.8rem;color:#6b7280}
+.tocsub{font-weight:800;font-size:.9rem;margin:14px 0 0}.tocr{display:inline-block;min-width:1.3em;font-weight:800;color:#7c3aed}
+.tocq{border:0;background:#ede9fe;color:#6d28d9;border-radius:8px;padding:1px 9px;font-weight:800;font-size:.86rem}.tocgo{border:0;background:none;padding:0;font-weight:800;color:#0f766e;font-size:.88rem;text-align:left}
 </style>
 </head>
 <body>
@@ -728,6 +734,7 @@ function mmWalk(n, p, f, lv = 0) { (n.c || []).forEach((c, i) => { const q = `${
 function viewMind() {
   const tot = MM.reduce((a, s) => a + 1 + mmCount(s), 0);
   $("#view").innerHTML = head("🧠 마인드맵", `한눈에 보는 CMT Level I · ${MM.length}주차 · ${tot}개 가지`) + `
+  ${tocCard()}
   <div class="mmsearch"><input class="inp" id="mQ" placeholder="🔍 가지 찾기 (예: RSI, 헤드앤숄더)" value="${esc(mmQ)}"></div>
   <div id="mHits"></div>
   <button class="btn b-orange" id="mHl">🖍 하이라이트·📝 메모<small>칠한 곳 ${hlCount("m")}개 모아 보기·듣기</small></button>
@@ -749,7 +756,7 @@ function viewMind() {
     box.querySelectorAll("[data-h]").forEach(b => b.onclick = () => { const h = r[+b.dataset.h]; mmSec = h.s.n; mmMode = "list";
       mmOpen = new Set(); const ps = h.p.split("."); for (let k = 2; k <= ps.length; k++) mmOpen.add(ps.slice(0, k).join(".")); go("msec", { focus: h.p }); });
   };
-  $("#mHl").onclick = openHl;
+  $("#mHl").onclick = openHl; wireToc();
   $("#mQ").oninput = e => { mmQ = e.target.value; hits(); };
   hits();
 }
@@ -1269,6 +1276,52 @@ function viewSearch(arg = {}) {
   inp.onkeydown = e => { if (e.key === "Enter") { srchSave(srchQ); inp.blur(); } };
   srchLoad().then(() => { if (tab === "search") draw(); });
   if (!srchQ) setTimeout(() => inp.focus(), 50);
+}
+
+/* ---------- 🧭 전체 목차 외우기 (마인드맵 맨 위 카드) ----------
+   덩어리로 나누기 → 한 문장으로 잇기 → 첫 글자 → 큰 가지. 가려 놓고 떠올리기, 문장은 내가 고칠 수 있어요. */
+const TOC = {"unit": "주차", "groups": [["이론·심리", [1, 2]], ["차트·추세·패턴", [3, 4, 5]], ["지표·통계·사이클", [6, 7, 8]], ["위험·시장·윤리", [9, 10]]], "short": {"1": "다우 이론", "2": "효율시장·행동재무", "3": "차트", "4": "추세", "5": "패턴", "6": "지표", "7": "통계·변동성", "8": "사이클·시스템", "9": "위험관리·상품", "10": "상대강도·윤리"}, "sent": "다우와 심리로 시작해, 차트를 그리고 추세와 패턴을 보고, 지표·통계·사이클로 재고, 위험을 관리하며 시장끼리 비교하고 윤리를 지킨다."};
+let tocHide = false, tocShown = new Set();
+const tocUnit = () => TOC.unit || "절";
+const tocShort = s => TOC.short?.[s.n] || String(s.t).split(/\s[—―]\s|\s―|:\s|\s\(/)[0].trim();
+const tocLbl = s => s.k || `${s.n}${tocUnit()}`;
+function tocKw(s) {
+  if (TOC.kw?.[s.n]) return TOC.kw[s.n];
+  return (s.c || []).map(r => String(r.t).replace(/^(?:[ⅠⅡⅢⅣⅤⅥⅦⅧⅨⅩ]+\s*|제\d+절\s*)/, "").split(/\s[—―]\s|\s―|:\s|\s\(|\(/)[0].trim()).map(t => t.length > 18 ? t.slice(0, 17) + "…" : t);
+}
+function tocGroups() {
+  if (TOC.groups) return TOC.groups.map(([g, ns]) => [g, ns.map(n => MM.find(s => s.n === n)).filter(Boolean)]).filter(x => x[1].length);
+  const G = new Map(); MM.forEach(s => { const g = s.g || "전체"; if (!G.has(g)) G.set(g, []); G.get(g).push(s); }); return [...G];
+}
+function tocCard() {
+  if (!window.MM || !MM.length) return "";
+  const sent = S.tocSent ?? TOC.sent ?? "", G = tocGroups(), R = "ⅠⅡⅢⅣⅤⅥⅦⅧⅨⅩ";
+  const cell = (key, txt) => tocHide && !tocShown.has(key) ? `<button class="tocq" data-tq="${esc(key)}">${esc([...txt][0] || "?")}…</button>` : esc(txt);
+  return `<details class="card toc" id="tocBox" ${S.tocOpen === false ? "" : "open"}><summary><b>🧭 전체 목차 외우기</b><span class="sm">${MM.length}${tocUnit()} · 덩어리 ${G.length}개 ▾</span></summary>
+  <div class="tocs">💡 ${sent ? esc(sent) : `<span class="sm">덩어리 첫 글자로 나만의 문장을 만들어 보세요</span>`} <button class="chip" id="tocEd" style="padding:3px 9px">✏️</button></div>
+  <table class="toct"><tr><th>덩어리</th><th>${tocUnit()}</th><th>첫 글자</th></tr>${G.map(([g, L]) => `<tr><td><b>${esc(g)}</b></td><td>${L.map(s => cell("s" + s.n, tocShort(s))).join(" · ")}</td><td style="white-space:nowrap">${L.map(s => esc([...tocShort(s)][0])).join("·")}</td></tr>`).join("")}</table>
+  <div class="tocsub">${tocUnit()}마다 큰 가지 <span class="sm">(${tocUnit()} 이름을 누르면 그 마인드맵으로 가요)</span></div>
+  <table class="toct">${MM.map(s => `<tr><td style="width:34%"><button class="tocgo" data-tgo="${s.n}">${esc(tocLbl(s))}</button><br>${cell("s" + s.n, tocShort(s))}</td><td>${tocKw(s).map((k, i) => `<span class="tocr">${R[i] || i + 1}</span> ${cell(`k${s.n}.${i}`, k)}`).join("<br>")}</td></tr>`).join("")}</table>
+  <div class="g2 mt"><button class="btn ${tocHide ? "b-gray" : "b-purple"}" id="tocHide">${tocHide ? "🙈 가리기 끄기" : "🙈 가려 놓고 떠올리기"}</button>${tocHide ? `<button class="btn b-gray" id="tocAgain">🔄 다시 가리기</button>` : `<button class="btn b-gray" id="tocTip">📅 외우는 순서</button>`}</div>
+  ${tocHide ? `<p class="sm" style="margin:8px 0 0">먼저 떠올려 말해 보고, 가려진 칸을 눌러 확인해요. ${tocShown.size ? `확인한 칸 ${tocShown.size}개` : ""}</p>` : ""}
+  </details>`;
+}
+function wireToc() {
+  const B = $("#tocBox"); if (!B) return;
+  const re = () => keepY(() => viewMind());
+  B.addEventListener("toggle", () => { S.tocOpen = B.open; save(); });
+  B.querySelectorAll("[data-tq]").forEach(b => b.onclick = () => { tocShown.add(b.dataset.tq); re(); });
+  B.querySelectorAll("[data-tgo]").forEach(b => b.onclick = () => { mmSec = +b.dataset.tgo; mmMode = "list"; go("msec"); });
+  $("#tocHide").onclick = () => { tocHide = !tocHide; tocShown = new Set(); re(); };
+  $("#tocAgain")?.addEventListener("click", () => { tocShown = new Set(); re(); });
+  $("#tocEd").onclick = () => { const v = prompt("외우기 문장을 고쳐 주세요 (비우면 처음 문장으로)", S.tocSent ?? TOC.sent ?? ""); if (v === null) return; if (v.trim()) S.tocSent = v.trim(); else delete S.tocSent; save(); re(); };
+  $("#tocTip")?.addEventListener("click", () => modal("📅 목차 외우는 순서", `<ol style="line-height:1.8;padding-left:1.2em;margin:0">
+    <li><b>덩어리</b>부터: 덩어리 이름과 순서만 먼저 외워요.</li>
+    <li><b>💡 문장</b>으로 ${tocUnit()} 순서를 이어요. 내 입에 붙게 ✏️로 고쳐 쓰세요.</li>
+    <li><b>큰 가지</b>(Ⅰ·Ⅱ·Ⅲ…)는 하루 2~3${tocUnit()}씩. 🙈 가려 놓고 떠올린 뒤 눌러서 확인해요.</li>
+    <li>매일 시작할 때 <b>1분</b>: 빈 종이에 ${tocUnit()} 이름을 모두 써 봐요.</li>
+    <li>다시 보는 간격: <b>다음 날 → 3일 뒤 → 1주 뒤 → 2주 뒤</b>.</li>
+    <li>세부(1. 2. ①②)는 각 ${tocUnit()} 화면의 🙈 가리기(목차 외우기)로 이어 가요.</li></ol>`));
 }
 
 /* ---------- 🎧 듣기 공부 ---------- */
