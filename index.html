@@ -249,6 +249,12 @@ mark.has-memo::after{content:"📝";font-size:.75em;margin-left:2px;vertical-ali
   body.printing{background:#fff!important;margin:0;padding:0}
   body.printing #printArea{display:block}
 }
+/* 🔍 용어 찾기 */
+.srchb{position:absolute;left:0;top:2px;width:42px;height:42px;border:0;border-radius:50%;background:#fff;box-shadow:0 2px 6px rgb(0 0 0 / .08);font-size:1.1rem}
+.srchbox{margin:12px 0 8px}.srchbox .inp{font-size:1.1rem}
+.srow{display:block;width:100%;text-align:left;border:0;background:none;border-top:1px solid #eef0f3;padding:10px 2px;font:inherit;color:inherit;line-height:1.5}
+.srg .t+.srow{border-top:0}.srow b{display:block;font-size:1rem}.srow .sm{display:block}.sm2{font-size:.92rem;color:#374151;margin-top:2px}
+.srow mark{background:#fef08a;color:inherit;border-radius:3px;padding:0 1px}.smore{margin-top:8px;padding:9px}
 </style>
 </head>
 <body>
@@ -413,12 +419,14 @@ function go(t, arg) {
   if (mock && t !== "mock") { if (!confirm("모의고사를 그만둘까요? 지금까지 푼 것은 저장되지 않아요.")) return; mock = null; }
   if (t !== "mock") stopMock();
   TTS.stop(true); tab = t; nav();
-  ({ home: viewHome, quiz: viewQuizMenu, cards: viewCards, book: viewBook, mind: viewMind, msec: viewMSec, session: viewSession, mock: viewMock, result: viewResult, section: viewSection, note: viewNoteHome, nsec: viewNote })[t](arg);
+  ({ home: viewHome, quiz: viewQuizMenu, cards: viewCards, book: viewBook, mind: viewMind, msec: viewMSec, session: viewSession, mock: viewMock, result: viewResult, section: viewSection, note: viewNoteHome, nsec: viewNote, search: viewSearch })[t](arg);
   scrollTo(0, 0);
 }
-const head = (title, sub, back) => `<header>${back ? `<button class="back" data-back="${back}">‹ 뒤로</button>` : ""}<h1>${title}</h1>${sub ? `<p>${sub}</p>` : ""}<button class="gear" data-set aria-label="설정">⚙</button></header>`;
+const head = (title, sub, back) => `<header>${back ? `<button class="back" data-back="${back}">‹ 뒤로</button>` : ""}<h1>${title}</h1>${sub ? `<p>${sub}</p>` : ""}${back ? "" : `<button class="srchb" data-srch aria-label="용어 찾기">🔍</button>`}<button class="gear" data-set aria-label="설정">⚙</button></header>`;
 function wireHead() {
   $("#view").querySelector("[data-set]")?.addEventListener("click", openSettings);
+  $("#view").querySelector("[data-srch]")?.addEventListener("click", () => go("search", { from: tab }));
+  { const bk = $("#view").querySelector("[data-back]"); if (srchRet && srchRet === tab && bk) { bk.textContent = "‹ 찾기"; bk.dataset.back = "search"; } else if (srchRet !== tab) srchRet = null; }
   $("#view").querySelector("[data-back]")?.addEventListener("click", e => go(e.currentTarget.dataset.back));
 }
 
@@ -1189,6 +1197,78 @@ function notePrintPage() {
   $("#ppGo").onclick = () => { try { window.print(); } catch (e) { } };
   document.querySelector(".nav").style.display = "none";
   return true;
+}
+
+/* ---------- 🔍 용어 찾기 ----------
+   교재·마인드맵·문제·암기카드를 한 번에 찾아요. 띄어쓰기는 달라도 찾아요 (예: "드라이클리닝" = "드라이 클리닝"). */
+const SRCH_EX = "RSI";
+let srchQ = "", srchRet = null, srchMore = {};
+/* 찾기에서 온 화면의 ‹ 찾기 버튼: 화면마다 따로 붙은 뒤로 동작보다 먼저 받아서 찾기로 돌아간다 */
+document.addEventListener("click", e => { const bk = e.target.closest?.("#view header [data-back]"); if (bk && srchRet && srchRet === tab) { e.stopPropagation(); e.preventDefault(); go("search"); } }, true);
+const srchRe = q => { const ch = [...q.replace(/\s+/g, "")].map(c => c.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")); return ch.length ? new RegExp(ch.join("\\s*"), "i") : null; };
+const srchTxt = v => String(v ?? "").replace(/<[^>]+>/g, " ").replace(/&nbsp;/g, " ");
+const srchMark = (t, re) => { const g = new RegExp(`(${re.source})`, "gi"); return t.split(g).map((x, i) => i % 2 ? `<mark>${esc(x)}</mark>` : esc(x)).join(""); };
+const srchSnip = (t, re, n = 40) => { t = srchTxt(t).replace(/\s+/g, " ").trim(); const m = re.exec(t); if (!m) return esc(t.slice(0, n * 2)); const a = Math.max(0, m.index - n), b = Math.min(t.length, m.index + m[0].length + n); return (a ? "…" : "") + srchMark(t.slice(a, b), re) + (b < t.length ? "…" : ""); };
+const blkTxt = b => typeof b.x === "string" ? b.x : [].concat(...Object.values(b).filter(Array.isArray)).flat(3).join(" ");
+async function srchLoad() {
+  if (typeof loadMM === "function" && !window.MM) await loadMM().catch(() => { });
+  if (typeof loadBook === "function") await loadBook().catch(() => { });
+}
+function srchFind(q) {
+  const re = srchRe(q); if (!re) return null;
+  const rank = t => { const s = srchTxt(t).replace(/\s+/g, ""), k = q.replace(/\s+/g, ""); return s === k ? 0 : s.startsWith(k) ? 1 : re.test(t) ? 2 : 3; };
+  const R = { card: [], mm: [], book: [], qs: [] };
+  // 🃏 암기카드 (뜻을 가장 빨리 볼 수 있어요)
+  (typeof allCards === "function" ? allCards() : window.CARDS || []).forEach(c => { if (re.test(c.f) || re.test(c.b)) R.card.push({ c, r: re.test(c.f) ? rank(c.f) : 3 }); });
+  // 🧠 마인드맵 (가지 이름과 설명)
+  (window.MM || []).forEach(s => { const trail = []; mmWalk(s, "r", (c, p, lv) => { trail[lv] = c.t; trail.length = lv + 1;
+    const nt = (c.n || []).map(x => x[1]).join(" ");
+    if (re.test(c.t) || re.test(nt)) R.mm.push({ s, p, t: c.t, path: trail.slice(0, -1), nt, r: re.test(c.t) ? rank(c.t) : 3 }); }); });
+  // 📖 교재
+  const B = window.BOOK || [];
+  if (B[0]?.blocks) B.forEach(s => s.blocks.forEach((b, j) => { const x = blkTxt(b); if (re.test(x)) R.book.push({ lbl: `${s.n}절 ${s.title}`, x, r: /^h/.test(b.t) ? rank(x) : 3, go: () => go("section", { n: s.n, focus: j }) }); }));
+  else B.forEach((P, p) => (P.s || []).forEach((s, i) => (s.b || []).forEach((b, j) => { const x = blkTxt(b); if (re.test(x)) R.book.push({ lbl: `${P.t} › ${s.t}`, x, r: /^h/.test(b.t) ? rank(x) : 3, go: () => go("section", { p, i, focus: j }) }); })));
+  // ✏️ 문제
+  const addQ = (arr, start) => (arr || []).forEach(o => { const x = [o.q, o.code, ...(o.o || []), o.e, typeof o.a === "string" ? o.a : "", o.ans].filter(Boolean).join(" "); if (re.test(x)) R.qs.push({ o, x, r: re.test(o.q) ? 2 : 3, go: () => start([o.id], "🔍 찾은 문제") }); });
+  if (typeof startSession === "function") addQ(window.QS, startSession);
+  else { if (typeof startW === "function") addQ(window.WQ, startW); if (typeof startS === "function") addQ(window.SQ, startS); }
+  for (const k in R) R[k].sort((a, b) => a.r - b.r);
+  return { re, R };
+}
+function srchSave(q) { q = q.trim(); if (!q) return; S.srch = [q, ...(S.srch || []).filter(x => x !== q)].slice(0, 8); save(); }
+function viewSearch(arg = {}) {
+  $("#view").innerHTML = head("🔍 용어 찾기", "교재·마인드맵·문제·카드를 한 번에", TABS.some(t => t[0] === arg.from) ? arg.from : "home") + `
+  <div class="srchbox"><input class="inp" id="sQ" type="search" enterkeyhint="search" placeholder="찾을 낱말 (예: ${esc(SRCH_EX)})" value="${esc(srchQ)}" autocomplete="off"></div>
+  <div id="sRecent"></div><div id="sRes"><p class="sm" style="text-align:center">불러오는 중…</p></div>`;
+  wireHead();
+  const inp = $("#sQ"), res = $("#sRes");
+  const recent = () => { const r = S.srch || []; $("#sRecent").innerHTML = !srchQ.trim() && r.length ? `<div class="chips">${r.map(x => `<button class="chip" data-rq="${esc(x)}">🕘 ${esc(x)}</button>`).join("")}<button class="chip" id="sRclr">지우기</button></div>` : "";
+    $("#sRecent").querySelectorAll("[data-rq]").forEach(b => b.onclick = () => { srchQ = inp.value = b.dataset.rq; draw(); });
+    $("#sRclr")?.addEventListener("click", () => { S.srch = []; save(); recent(); }); };
+  const open = f => { srchSave(srchQ); f(); };
+  const draw = () => {
+    recent();
+    const q = srchQ.trim();
+    if (!q) { res.innerHTML = `<section class="card"><p class="sm" style="margin:0;line-height:1.7">낱말을 치면 교재, 마인드맵, 문제, 암기카드에서 한꺼번에 찾아 줘요.<br>띄어쓰기는 달라도 찾아요. 결과를 누르면 그곳으로 가고, <b>‹ 찾기</b>로 돌아와요.</p></section>`; return; }
+    const F = srchFind(q); if (!F) return;
+    const { re, R } = F, tot = R.card.length + R.mm.length + R.book.length + R.qs.length;
+    const grp = (key, title, list, row) => { if (!list.length) return ""; const n = srchMore[key] ? 40 : 4;
+      return `<section class="card srg"><div class="t">${title} <span>${list.length > 99 ? "99+" : list.length}개</span></div>${list.slice(0, n).map((h, i) => row(h, i)).join("")}${list.length > n ? `<button class="btn b-gray smore" data-more="${key}">더 보기 (${list.length - n}개 더)</button>` : ""}</section>`; };
+    res.innerHTML = !tot ? `<section class="card"><p class="sm" style="margin:0">"${esc(q)}"가 들어간 내용이 없어요. 낱말을 짧게 바꿔 보세요.</p></section>` :
+      grp("card", "🃏 암기카드", R.card, (h, i) => `<div class="srow"><b>${srchMark(srchTxt(h.c.f), re)}</b><div class="sm2">${srchMark(srchTxt(h.c.b), re)}</div>${h.c.d ? `<span class="sm">${esc(h.c.d)}</span>` : ""}</div>`) +
+      grp("mm", "🧠 마인드맵", R.mm, (h, i) => `<button class="srow" data-g="mm" data-i="${i}"><span class="sm">${esc(nLbl(h.s))} › ${h.path.map(esc).join(" › ")}</span><b>${srchMark(h.t, re)}</b>${!re.test(h.t) && h.nt ? `<div class="sm2">${srchSnip(h.nt, re)}</div>` : ""}</button>`) +
+      grp("book", "📖 교재", R.book, (h, i) => `<button class="srow" data-g="book" data-i="${i}"><span class="sm">${esc(h.lbl)}</span><div class="sm2">${srchSnip(h.x, re)}</div></button>`) +
+      grp("qs", "✏️ 문제", R.qs, (h, i) => `<button class="srow" data-g="qs" data-i="${i}"><div class="sm2">${srchSnip(re.test(h.o.q) ? h.o.q : h.x, re, 50)}</div><span class="sm">누르면 이 문제를 풀어요</span></button>`);
+    res.querySelectorAll("[data-more]").forEach(b => b.onclick = () => { srchMore[b.dataset.more] = 1; draw(); });
+    res.querySelectorAll("[data-g]").forEach(b => b.onclick = () => { const h = R[b.dataset.g][+b.dataset.i];
+      if (b.dataset.g === "mm") open(() => { srchRet = "msec"; mmSec = h.s.n; mmMode = "list"; mmOpen = new Set(); const ps = h.p.split("."); for (let k = 2; k <= ps.length; k++) mmOpen.add(ps.slice(0, k).join(".")); go("msec", { focus: h.p }); });
+      else if (b.dataset.g === "book") open(() => { srchRet = "section"; h.go(); });
+      else open(() => { srchRet = null; h.go(); }); });
+  };
+  let tm; inp.oninput = () => { srchQ = inp.value; srchMore = {}; clearTimeout(tm); tm = setTimeout(draw, 220); };
+  inp.onkeydown = e => { if (e.key === "Enter") { srchSave(srchQ); inp.blur(); } };
+  srchLoad().then(() => { if (tab === "search") draw(); });
+  if (!srchQ) setTimeout(() => inp.focus(), 50);
 }
 
 /* ---------- 🎧 듣기 공부 ---------- */
